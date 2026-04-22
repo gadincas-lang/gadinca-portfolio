@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ObrasApp — Demo 120s</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0e14;
+    color: #1a202c;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ============ TOP CONTROL BAR ============ */
+  .top-bar {
+    background: linear-gradient(135deg, #1E2761 0%, #3D5AFE 100%);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 100;
+    flex-shrink: 0;
+  }
+  .top-bar-title { font-size: 14px; font-weight: 600; letter-spacing: 1px; opacity: 0.9; }
+  .top-bar-title span { color: #CADCFC; font-weight: 400; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  .ctrl-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.25); }
+  .ctrl-btn.active { background: #fff; color: #1E2761; }
+  .scene-indicator { display: flex; gap: 5px; margin-right: 12px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: all 0.3s; }
+  .dot.active { background: #fff; transform: scale(1.3); }
+  .dot.done { background: #CADCFC; }
+  .time-display {
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-right: 12px;
+    min-width: 70px;
+  }
+
+  /* ============ STAGE ============ */
+  .stage { flex: 1; position: relative; overflow: hidden; background: #f7f9fc; }
+
+  /* ============ APP MOCK ============ */
+  .app { position: absolute; inset: 0; display: flex; flex-direction: column; }
+  .app-header {
+    background: #2b6cb0;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 50px;
+    flex-shrink: 0;
+  }
+  .app-logo { font-size: 16px; font-weight: 700; letter-spacing: 0.3px; }
+  .obra-badge {
+    background: white;
+    color: #1E2761;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.4s;
+  }
+  .obra-badge.changing {
+    animation: badgeFlash 0.6s;
+  }
+  @keyframes badgeFlash {
+    50% { background: #fef3c7; transform: scale(1.1); }
+  }
+  .user-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.4s;
+  }
+  .online-dot { color: #48bb78; font-size: 13px; display: flex; align-items: center; gap: 4px; }
+  .online-dot::before { content: ''; width: 8px; height: 8px; background: #48bb78; border-radius: 50%; display: inline-block; }
+
+  .app-body { flex: 1; display: flex; overflow: hidden; }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: 180px;
+    background: #1a202c;
+    color: white;
+    padding: 12px 0;
+    font-size: 12px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar-section { padding: 10px 16px 4px; font-size: 9px; letter-spacing: 1.5px; color: #718096; font-weight: 600; }
+  .sidebar-item {
+    padding: 7px 16px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    color: #e2e8f0;
+    font-size: 12px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.05); }
+  .sidebar-item.active {
+    background: #2b6cb0;
+    color: white;
+    font-weight: 600;
+    border-left-color: #3D5AFE;
+  }
+  .sidebar-item .icon { font-size: 14px; width: 16px; }
+
+  /* ============ MAIN CONTENT ============ */
+  .main { flex: 1; background: #f7f9fc; padding: 20px 28px; overflow-y: auto; position: relative; }
+  .page-title { font-size: 22px; font-weight: 700; color: #1a202c; margin-bottom: 4px; }
+  .page-subtitle { font-size: 12px; color: #718096; margin-bottom: 18px; }
+
+  /* ============ KPI CARDS ============ */
+  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 18px; }
+  .kpi-card {
+    background: white;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border-left: 3px solid #cbd5e0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: all 0.3s;
+  }
+  .kpi-card.accent-blue { border-left-color: #3D5AFE; }
+  .kpi-card.accent-green { border-left-color: #48bb78; }
+  .kpi-card.accent-red { border-left-color: #f56565; }
+  .kpi-card.accent-purple { border-left-color: #9f7aea; }
+  .kpi-card.accent-orange { border-left-color: #f59e0b; }
+  .kpi-label { font-size: 9px; letter-spacing: 0.8px; color: #718096; font-weight: 600; margin-bottom: 5px; }
+  .kpi-value { font-family: Consolas, monospace; font-size: 16px; font-weight: 700; color: #1a202c; line-height: 1.2; }
+  .kpi-value.green { color: #2f855a; }
+  .kpi-value.red { color: #c53030; }
+  .kpi-sub { font-size: 10px; color: #a0aec0; margin-top: 3px; }
+  .kpi-bar { height: 3px; background: #edf2f7; margin-top: 6px; border-radius: 2px; overflow: hidden; }
+  .kpi-bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); background: currentColor; }
+
+  /* ============ PANEL ============ */
+  .panel { background: white; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 14px; }
+  .panel-title { font-size: 14px; font-weight: 600; color: #1a202c; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+  /* ============ TABLE ============ */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    text-align: left; padding: 8px 10px;
+    font-size: 10px; letter-spacing: 0.6px;
+    color: #718096; font-weight: 600;
+    border-bottom: 1px solid #e2e8f0; background: #f7f9fc;
+  }
+  tbody td { padding: 10px; border-bottom: 1px solid #edf2f7; color: #2d3748; }
+  tbody tr {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  tbody tr.visible { opacity: 1; transform: translateX(0); }
+  tbody tr.highlight { background: #fff5e6; animation: highlightPulse 1.5s ease-out; }
+  @keyframes highlightPulse {
+    0% { background: #ffd89b; }
+    100% { background: transparent; }
+  }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+  .badge-green { background: #c6f6d5; color: #22543d; }
+  .badge-blue { background: #bee3f8; color: #2c5282; }
+  .badge-yellow { background: #fefcbf; color: #744210; }
+  .badge-red { background: #fed7d7; color: #822727; }
+  .badge-purple { background: #e9d8fd; color: #44337a; }
+  .mono { font-family: Consolas, monospace; }
+  .num { text-align: right; font-family: Consolas, monospace; }
+  .num.red { color: #c53030; }
+  .num.green { color: #2f855a; }
+
+  /* ============ CURVA S ============ */
+  .chart-container { background: white; border-radius: 8px; padding: 16px 20px; height: 340px; display: flex; flex-direction: column; }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .alert-badge {
+    background: #fed7d7;
+    color: #822727;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+  }
+  .alert-badge.show {
+    animation: alertDramatic 1s forwards, alertShake 0.5s 1s, alertPulse 1.5s 1.5s infinite;
+  }
+  @keyframes alertDramatic {
+    0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+    60% { opacity: 1; transform: scale(1.15) rotate(3deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  @keyframes alertShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  @keyframes alertPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(229, 62, 62, 0); }
+  }
+  .legend { display: flex; gap: 16px; font-size: 11px; justify-content: center; margin-bottom: 8px; color: #4a5568; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 16px; height: 10px; border-radius: 2px; }
+
+  /* ============ FORM ============ */
+  .form-inline {
+    display: grid;
+    grid-template-columns: 110px 1fr 130px 110px 130px auto;
+    gap: 10px;
+    align-items: flex-end;
+    padding: 12px;
+    background: #f7f9fc;
+    border: 1px dashed #cbd5e0;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .form-field { display: flex; flex-direction: column; gap: 3px; }
+  .form-label { font-size: 9px; color: #718096; font-weight: 600; letter-spacing: 0.5px; }
+  .form-input, .form-select {
+    padding: 6px 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 11px;
+    background: white;
+    color: #1a202c;
+  }
+  .form-input.highlight-input { animation: inputFlash 0.5s ease-out; }
+  @keyframes inputFlash {
+    0% { background: white; }
+    50% { background: #fef3c7; box-shadow: 0 0 0 2px #f59e0b; }
+    100% { background: white; }
+  }
+  .btn {
+    padding: 7px 14px; border: none; border-radius: 4px;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    background: #48bb78; color: white;
+  }
+  .btn-primary { background: #3D5AFE; }
+  .btn-red { background: #e53e3e; }
+
+  /* ============ STAT CALLOUTS ============ */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .stat-callout { background: white; padding: 14px; border-radius: 8px; border-left: 4px solid #3D5AFE; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .stat-callout.green { border-left-color: #48bb78; }
+  .stat-callout.red { border-left-color: #f56565; }
+  .stat-callout.orange { border-left-color: #f59e0b; }
+  .stat-label { font-size: 10px; letter-spacing: 0.5px; color: #718096; font-weight: 600; }
+  .stat-value { font-size: 20px; font-weight: 700; color: #1a202c; font-family: Consolas, monospace; margin-top: 4px; }
+  .stat-value.green { color: #2f855a; }
+  .stat-value.red { color: #c53030; }
+
+  /* ============ VIRTUAL CURSOR ============ */
+  .cursor {
+    position: fixed;
+    width: 28px; height: 28px;
+    pointer-events: none;
+    z-index: 9999;
+    transition: all 0.8s cubic-bezier(0.45, 0, 0.2, 1);
+    opacity: 0;
+  }
+  .cursor::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' stroke='%23000' stroke-width='1.5' stroke-linejoin='round' d='M5 3l10 11h-5l3 7-2 1-3-7-3 3V3z'/%3E%3C/svg%3E") no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  }
+  .cursor.visible { opacity: 1; }
+  .cursor.clicking::after {
+    content: '';
+    position: absolute; left: 50%; top: 50%;
+    width: 40px; height: 40px;
+    transform: translate(-50%, -50%);
+    border: 2px solid #3D5AFE;
+    border-radius: 50%;
+    animation: clickRipple 0.5s ease-out;
+  }
+  @keyframes clickRipple {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  }
+
+  /* ============ CHAPTER TRANSITION OVERLAY ============ */
+  .chapter-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0a0e14 0%, #1E2761 100%);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 60px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .chapter-overlay.visible { opacity: 1; }
+  .chapter-number {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    letter-spacing: 8px;
+    color: #3D5AFE;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .chapter-overlay.visible .chapter-number {
+    animation: slideUpFade 0.7s 0.15s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  .chapter-title {
+    font-family: Georgia, serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.05;
+    text-align: center;
+    max-width: 1000px;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  .chapter-overlay.visible .chapter-title {
+    animation: slideUpFade 0.9s 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  .chapter-accent {
+    width: 0;
+    height: 3px;
+    background: #3D5AFE;
+    margin: 28px 0 24px;
+    transition: width 0.7s 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  .chapter-overlay.visible .chapter-accent { width: 80px; }
+  .chapter-sub {
+    font-size: 18px;
+    color: #CADCFC;
+    font-style: italic;
+    max-width: 700px;
+    text-align: center;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .chapter-overlay.visible .chapter-sub {
+    animation: slideUpFade 0.7s 1.1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+  @keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .chapter-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #3D5AFE 50%, transparent 100%);
+    opacity: 0.7;
+  }
+  .chapter-overlay::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #3D5AFE 50%, transparent 100%);
+    opacity: 0.7;
+  }
+
+  /* ============ CAPTION / LABEL ============ */
+  .caption {
+    position: absolute;
+    bottom: 24px;
+    left: 28px;
+    background: rgba(10, 14, 20, 0.92);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 480px;
+    backdrop-filter: blur(8px);
+    border-left: 3px solid #3D5AFE;
+    z-index: 50;
+  }
+  .caption.visible { opacity: 1; transform: translateY(0); }
+  .caption-chapter {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: #CADCFC;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  /* ============ PROGRESS BAR ============ */
+  .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3D5AFE 0%, #CADCFC 100%);
+    width: 0%;
+    transition: width 0.4s linear;
+    z-index: 60;
+    box-shadow: 0 0 8px rgba(61, 90, 254, 0.6);
+  }
+
+  /* ============ INTRO ============ */
+  .intro {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, #1E2761 0%, #0a0e14 100%);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 300;
+    transition: opacity 0.8s;
+  }
+  .intro.hidden { opacity: 0; pointer-events: none; }
+  .intro-logo {
+    font-family: Georgia, serif;
+    font-size: 88px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: introLogo 1s 0.3s forwards;
+  }
+  .intro-sub {
+    font-size: 20px;
+    color: #CADCFC;
+    font-style: italic;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .intro-accent {
+    width: 60px; height: 3px;
+    background: #3D5AFE;
+    margin: 18px 0;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.1s forwards;
+  }
+  .intro-tag {
+    margin-top: 40px;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #718096;
+    font-weight: 600;
+    opacity: 0;
+    animation: fadeUp 0.6s 1.4s forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes introLogo {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); letter-spacing: 10px; }
+    100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: 0; }
+  }
+
+  /* Dot pulse */
+  @keyframes pulseDot {
+    0%, 100% { r: 4; opacity: 1; }
+    50% { r: 7; opacity: 0.7; }
+  }
+  .pulse-dot { animation: pulseDot 2s infinite; }
+
+  /* Dramatic zoom */
+  @keyframes dramaticZoom {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  .dramatic-zoom { animation: dramaticZoom 1.2s; }
+
+  /* Scene fade */
+  .main > .scene {
+    position: absolute;
+    inset: 20px 28px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  .main > .scene.active { opacity: 1; pointer-events: auto; }
+
+  /* ============ OUTRO ============ */
+  .outro {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #1E2761 0%, #0a0e14 100%);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s;
+    padding: 0 60px;
+  }
+  .outro.visible { opacity: 1; pointer-events: auto; }
+  .outro-tag {
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: #3D5AFE;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .outro-title {
+    font-family: Georgia, serif;
+    font-size: 56px;
+    color: white;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 1100px;
+    margin-bottom: 16px;
+  }
+  .outro-hi { color: #3D5AFE; }
+  .outro-sub {
+    font-size: 20px;
+    color: #CADCFC;
+    font-style: italic;
+    max-width: 700px;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .outro-cta-btn {
+    background: #25D366;
+    color: white;
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: waPulse 2s infinite;
+    border: none;
+    cursor: pointer;
+  }
+  .outro-cta-btn:hover {
+    background: #128C7E;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(37, 211, 102, 0.5);
+  }
+  @keyframes waPulse {
+    0%, 100% { box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4), 0 0 0 0 rgba(37, 211, 102, 0.6); }
+    50% { box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4), 0 0 0 14px rgba(37, 211, 102, 0); }
+  }
+  .wa-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+  .outro-cta-text { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
+  .outro-cta-label { font-size: 10px; letter-spacing: 2px; font-weight: 700; opacity: 0.85; }
+  .outro-cta-number { font-size: 20px; font-weight: 700; font-family: Consolas, monospace; margin-top: 2px; }
+  .outro-url {
+    margin-top: 24px;
+    font-family: Consolas, monospace;
+    font-size: 14px;
+    color: #CADCFC;
+    letter-spacing: 1px;
+  }
+
+  /* ============ AI CHAT ============ */
+  .chat-container {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 18px;
+    min-height: 340px;
+    position: relative;
+  }
+  .chat-msg {
+    padding: 10px 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    font-size: 13px;
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.35s;
+  }
+  .chat-msg.visible { opacity: 1; transform: translateY(0); }
+  .chat-msg.user {
+    background: #3D5AFE;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-msg.ai {
+    background: white;
+    color: #1a202c;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .chat-msg.ai strong { color: #3D5AFE; }
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .typing span {
+    width: 6px; height: 6px;
+    background: #3D5AFE;
+    border-radius: 50%;
+    animation: typingDot 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+  .chat-input {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+  }
+  .chat-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: #1a202c;
+  }
+  .chat-input .send-icon {
+    color: #3D5AFE;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* ============ ROLE CARD ============ */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .role-card {
+    background: white;
+    padding: 14px;
+    border-radius: 8px;
+    border-left: 3px solid #cbd5e0;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .role-card.visible { opacity: 1; transform: translateY(0); }
+  .role-card.accent-blue { border-left-color: #3D5AFE; }
+  .role-card.accent-green { border-left-color: #48bb78; }
+  .role-card.accent-purple { border-left-color: #9f7aea; }
+  .role-card.accent-orange { border-left-color: #f59e0b; }
+  .role-card.accent-pink { border-left-color: #ed64a6; }
+  .role-card.accent-teal { border-left-color: #319795; }
+  .role-title { font-size: 14px; font-weight: 700; color: #1a202c; }
+  .role-sub { font-size: 10px; color: #a0aec0; margin: 4px 0 8px; letter-spacing: 0.5px; font-weight: 600; }
+  .role-desc { font-size: 11px; color: #4a5568; line-height: 1.4; }
+
+  /* ============ KARDEX ANIMATION ============ */
+  .kardex-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .stock-viz {
+    background: white;
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  .stock-title { font-size: 12px; font-weight: 700; color: #718096; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .stock-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .stock-bar-label { width: 140px; color: #2d3748; font-weight: 600; }
+  .stock-bar-track { flex: 1; height: 22px; background: #edf2f7; border-radius: 4px; overflow: hidden; position: relative; }
+  .stock-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3D5AFE, #667eea);
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: Consolas, monospace;
+  }
+  .stock-bar-fill.used { background: linear-gradient(90deg, #f59e0b, #f97316); }
+
+  /* ============ SCAN ANIMATION ============ */
+  .scan-demo {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .scan-box {
+    width: 240px;
+    height: 280px;
+    background: linear-gradient(180deg, #f7f9fc 0%, #edf2f7 100%);
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-size: 11px;
+    color: #718096;
+  }
+  .scan-box.scanning::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #3D5AFE, transparent);
+    box-shadow: 0 0 8px #3D5AFE;
+    animation: scanLine 1.5s ease-in-out infinite;
+  }
+  @keyframes scanLine {
+    0%, 100% { top: 0; }
+    50% { top: 95%; }
+  }
+  .scan-factura {
+    width: 180px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    font-size: 9px;
+    color: #2d3748;
+    line-height: 1.4;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .scan-factura-title { font-weight: 700; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+  .scan-fields { display: flex; flex-direction: column; gap: 8px; font-size: 11px; }
+  .scan-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f7f9fc;
+    border-radius: 5px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+  }
+  .scan-field.detected {
+    background: #c6f6d5;
+    border-left-color: #48bb78;
+  }
+  .scan-field-label { color: #718096; font-weight: 600; font-size: 10px; letter-spacing: 0.4px; }
+  .scan-field-value { font-family: Consolas, monospace; font-weight: 700; color: #1a202c; }
+
+</style>
+</head>
+<body>
+
+<!-- ============ TOP CONTROL BAR ============ -->
+<div class="top-bar">
+  <div class="top-bar-title">OBRASAPP <span>· Sistema integral de gestión de obras</span></div>
+  <div class="controls">
+    <div class="time-display" id="timeDisplay">00:00 / 02:45</div>
+    <div class="scene-indicator" id="sceneDots"></div>
+    <button class="ctrl-btn" id="btnSound" title="Activar/desactivar sonido">🔇 SONIDO</button>
+    <button class="ctrl-btn" id="btnMode">▶ AUTO</button>
+    <button class="ctrl-btn" id="btnPrev">◀ Anterior</button>
+    <button class="ctrl-btn" id="btnNext">Siguiente ▶</button>
+    <button class="ctrl-btn" id="btnRestart">↻ Reiniciar</button>
+  </div>
+</div>
+
+<!-- ============ STAGE ============ -->
+<div class="stage">
+
+  <!-- INTRO -->
+  <div class="intro" id="intro">
+    <div class="intro-logo">ObrasApp</div>
+    <div class="intro-accent"></div>
+    <div class="intro-sub">Una obra, de cero a estados financieros</div>
+    <div class="intro-tag">UNA HISTORIA REAL EN NÚMEROS</div>
+  </div>
+
+  <!-- CHAPTER TRANSITION OVERLAY -->
+  <div class="chapter-overlay" id="chapterOverlay">
+    <div class="chapter-number" id="chapterNumber">CAPÍTULO 01</div>
+    <div class="chapter-title" id="chapterTitle">Título del capítulo</div>
+    <div class="chapter-accent"></div>
+    <div class="chapter-sub" id="chapterSub">Subtítulo descriptivo</div>
+  </div>
+
+  <!-- APP MOCKUP -->
+  <div class="app">
+    <div class="app-header">
+      <div class="app-logo">🏗 Obras Bolivia</div>
+      <div class="obra-badge" id="obraBadge">Edificio Equipetrol</div>
+      <div class="user-badge" id="userBadge">👤 Admin Pruebas ▾</div>
+      <div class="online-dot">En línea</div>
+    </div>
+
+    <div class="app-body">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-section">RESUMEN</div>
+        <div class="sidebar-item" data-nav="dashboard"><span class="icon">📊</span>Dashboard</div>
+        <div class="sidebar-section">MI EMPRESA</div>
+        <div class="sidebar-item" data-nav="obras"><span class="icon">🏗</span>Obras</div>
+        <div class="sidebar-item" data-nav="usuarios"><span class="icon">👥</span>Usuarios</div>
+        <div class="sidebar-section">TRANSACCIONES</div>
+        <div class="sidebar-item" data-nav="cuentas"><span class="icon">🏦</span>Cuentas</div>
+        <div class="sidebar-item" data-nav="ingresos"><span class="icon">💰</span>Ingresos</div>
+        <div class="sidebar-item" data-nav="gastos"><span class="icon">🧾</span>Gastos</div>
+        <div class="sidebar-section">PROYECTO</div>
+        <div class="sidebar-item" data-nav="presupuesto"><span class="icon">📋</span>Presupuesto</div>
+        <div class="sidebar-item" data-nav="cronograma"><span class="icon">📅</span>Cronograma</div>
+        <div class="sidebar-section">ALMACÉN</div>
+        <div class="sidebar-item" data-nav="stock"><span class="icon">📦</span>Stock actual</div>
+        <div class="sidebar-item" data-nav="kardex"><span class="icon">📒</span>Kardex</div>
+        <div class="sidebar-section">ESTADOS FIN.</div>
+        <div class="sidebar-item" data-nav="pyg"><span class="icon">📈</span>Estado P&amp;G</div>
+        <div class="sidebar-item" data-nav="balance"><span class="icon">⚖️</span>Balance</div>
+        <div class="sidebar-section">MANO DE OBRA</div>
+        <div class="sidebar-item" data-nav="planillas"><span class="icon">👷</span>Planillas</div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="main" id="main">
+
+        <!-- ESCENA 1: DASHBOARD EN CERO -->
+        <div class="scene active" data-scene="1">
+          <div class="page-title">Edificio Equipetrol</div>
+          <div class="page-subtitle">Santa Cruz de la Sierra · Obra recién registrada · 15 abr 2026</div>
+          <div class="kpi-row">
+            <div class="kpi-card accent-blue">
+              <div class="kpi-label">PRESUPUESTO TOTAL</div>
+              <div class="kpi-value">Bs <span data-counter="43526780" data-decimals="2">0</span></div>
+              <div class="kpi-sub">15 abr 2026 → —</div>
+            </div>
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">INGRESOS COBRADOS</div>
+              <div class="kpi-value green">Bs <span data-counter="0" data-decimals="2">0</span></div>
+              <div class="kpi-sub">0% del presupuesto</div>
+            </div>
+            <div class="kpi-card accent-red">
+              <div class="kpi-label">GASTOS EJECUTADOS</div>
+              <div class="kpi-value red">Bs <span data-counter="0" data-decimals="2">0</span></div>
+              <div class="kpi-sub">0% del presupuesto</div>
+            </div>
+            <div class="kpi-card accent-green">
+              <div class="kpi-label">RESULTADO</div>
+              <div class="kpi-value">Bs 0,00</div>
+              <div class="kpi-sub">— sobre ingresos</div>
+            </div>
+            <div class="kpi-card accent-purple">
+              <div class="kpi-label">AVANCE DE OBRA</div>
+              <div class="kpi-value">0.0%</div>
+            </div>
+            <div class="kpi-card accent-orange">
+              <div class="kpi-label">MATERIALES EN STOCK</div>
+              <div class="kpi-value">Bs 0,00</div>
+              <div class="kpi-sub">0 materiales</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🎯 Próximos pasos recomendados</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div style="padding: 14px; background: #f7f9fc; border-radius: 6px; border-left: 3px solid #3D5AFE;">
+                <div style="font-weight: 700; font-size: 13px;">1. Asignar equipo</div>
+                <div style="font-size: 11px; color: #718096; margin-top: 4px;">Residente, contador, propietario</div>
+              </div>
+              <div style="padding: 14px; background: #f7f9fc; border-radius: 6px; border-left: 3px solid #48bb78;">
+                <div style="font-weight: 700; font-size: 13px;">2. Cargar presupuesto</div>
+                <div style="font-size: 11px; color: #718096; margin-top: 4px;">Importar desde Excel o ZarCo</div>
+              </div>
+              <div style="padding: 14px; background: #f7f9fc; border-radius: 6px; border-left: 3px solid #f59e0b;">
+                <div style="font-weight: 700; font-size: 13px;">3. Registrar anticipo</div>
+                <div style="font-size: 11px; color: #718096; margin-top: 4px;">Desembolso inicial del cliente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCENA 2: MULTI-OBRA Y ROLES -->
+        <div class="scene" data-scene="2">
+          <div class="page-title">Usuarios y roles</div>
+          <div class="page-subtitle">Cada persona ve solo lo que necesita — arquitectura multi-tenant</div>
+
+          <div class="panel" style="padding: 12px 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 13px; font-weight: 700;">Tu empresa · 3 obras activas</div>
+              <div style="display: flex; gap: 6px;">
+                <span class="badge badge-blue">Edificio Equipetrol</span>
+                <span class="badge badge-purple">Galpón Warnes</span>
+                <span class="badge badge-green">Vivienda Urubó</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="role-grid">
+            <div class="role-card accent-blue" data-role="1">
+              <div class="role-title">👑 Admin de empresa</div>
+              <div class="role-sub">ACCESO TOTAL · 3 OBRAS</div>
+              <div class="role-desc">Gestiona obras, usuarios, precios y configuración global.</div>
+            </div>
+            <div class="role-card accent-green" data-role="2">
+              <div class="role-title">🎯 Director de obra</div>
+              <div class="role-sub">VISTA MULTI-OBRA</div>
+              <div class="role-desc">Ve todas las obras para consolidar y comparar desempeño.</div>
+            </div>
+            <div class="role-card accent-orange" data-role="3">
+              <div class="role-title">👷 Residente</div>
+              <div class="role-sub">1 OBRA ASIGNADA</div>
+              <div class="role-desc">Registra gastos, planillas y consumos día a día en su obra.</div>
+            </div>
+            <div class="role-card accent-pink" data-role="4">
+              <div class="role-title">💼 Admin de obra</div>
+              <div class="role-sub">1 OBRA · OPERACIÓN</div>
+              <div class="role-desc">Opera la obra asignada: presupuesto, cronograma, reportes.</div>
+            </div>
+            <div class="role-card accent-purple" data-role="5">
+              <div class="role-title">📊 Contador</div>
+              <div class="role-sub">SOLO LECTURA · ESTADOS</div>
+              <div class="role-desc">Accede a P&G, Balance, Sumas y Saldos. No modifica datos.</div>
+            </div>
+            <div class="role-card accent-teal" data-role="6">
+              <div class="role-title">👁 Visualización</div>
+              <div class="role-sub">SOLO DASHBOARD · PROPIETARIO</div>
+              <div class="role-desc">Cliente o propietario ve KPIs sin acceder a detalles sensibles.</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top: 18px; background: linear-gradient(135deg, #1E2761 0%, #3D5AFE 100%); color: white; border: none; text-align: center; padding: 14px;">
+            <div style="font-size: 14px; font-weight: 700;">🔒 Datos aislados por obra · Cada usuario solo ve lo autorizado</div>
+          </div>
+        </div>
+
+        <!-- ESCENA 3: ANTICIPO -->
+        <div class="scene" data-scene="3">
+          <div class="page-title">Ingresos</div>
+          <div class="page-subtitle">El cliente deposita el anticipo — primer movimiento real</div>
+
+          <div class="panel">
+            <div class="panel-title">➕ Registrar Ingreso</div>
+            <div class="form-inline">
+              <div class="form-field"><div class="form-label">FECHA *</div><input class="form-input" id="inputFecha" value="15 abr 2026"></div>
+              <div class="form-field"><div class="form-label">CONCEPTO *</div><input class="form-input" id="inputConcepto" placeholder="Descripción del ingreso"></div>
+              <div class="form-field"><div class="form-label">MONTO (BS) *</div><input class="form-input mono" id="inputMonto" placeholder="0.00"></div>
+              <div class="form-field"><div class="form-label">TIPO</div><select class="form-select"><option>Anticipo</option></select></div>
+              <div class="form-field"><div class="form-label">CUENTA QUE RECIBE</div><select class="form-select"><option>BANCO BISA</option></select></div>
+              <button class="btn">💾 Guardar</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">📃 Registros recientes</div>
+            <table>
+              <thead><tr><th>FECHA</th><th>CONCEPTO</th><th>TIPO</th><th>CUENTA</th><th class="num">MONTO (BS)</th></tr></thead>
+              <tbody id="ingresosTable"></tbody>
+              <tfoot><tr><td colspan="4" style="font-weight: 700; text-align: right; padding: 12px 10px;">TOTAL INGRESOS</td><td class="num" style="font-weight: 700; color: #2f855a; font-size: 14px;">Bs <span data-counter-2="0" data-decimals="2">0</span></td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- ESCENA 4: GASTOS CON ESCANEO -->
+        <div class="scene" data-scene="4">
+          <div class="page-title">Gastos con escaneo de factura</div>
+          <div class="page-subtitle">La factura en la mano → datos en el sistema en 3 segundos</div>
+
+          <div class="scan-demo">
+            <div class="scan-box" id="scanBox">
+              <div class="scan-factura" id="scanFactura" style="display: none;">
+                <div class="scan-factura-title">FERRETERÍA NELLY</div>
+                <div style="font-size: 9px;">NIT: 1023456789</div>
+                <div style="font-size: 9px;">Fact. N° 00234</div>
+                <div style="font-size: 9px; margin-top: 4px;">Fecha: 15/04/2026</div>
+                <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e0;">
+                  <div style="font-size: 9px;">550 bolsas cemento Portland</div>
+                  <div style="font-size: 9px;">x Bs 72,00 c/u</div>
+                </div>
+                <div style="font-size: 11px; font-weight: 700; margin-top: 8px; padding-top: 6px; border-top: 1px solid #1a202c;">TOTAL: Bs 39.600,00</div>
+              </div>
+              <div id="scanBoxPlaceholder">📷 Cámara lista<div style="font-size: 10px; margin-top: 6px;">Pon la factura frente al lente</div></div>
+            </div>
+
+            <div class="scan-fields">
+              <div style="font-size: 12px; font-weight: 700; color: #1a202c; margin-bottom: 4px;">🔍 DETECTADO AUTOMÁTICAMENTE</div>
+              <div class="scan-field" id="field-prov"><span class="scan-field-label">PROVEEDOR</span><span class="scan-field-value">—</span></div>
+              <div class="scan-field" id="field-nit"><span class="scan-field-label">NIT</span><span class="scan-field-value">—</span></div>
+              <div class="scan-field" id="field-factura"><span class="scan-field-label">N° FACTURA</span><span class="scan-field-value">—</span></div>
+              <div class="scan-field" id="field-concepto"><span class="scan-field-label">CONCEPTO</span><span class="scan-field-value">—</span></div>
+              <div class="scan-field" id="field-cant"><span class="scan-field-label">CANTIDAD</span><span class="scan-field-value">—</span></div>
+              <div class="scan-field" id="field-monto"><span class="scan-field-label">MONTO TOTAL</span><span class="scan-field-value">—</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">📃 Gastos registrados en estos días</div>
+            <table>
+              <thead><tr><th>FECHA</th><th>CONCEPTO</th><th>CATEGORÍA</th><th>PROVEEDOR</th><th class="num">CANT.</th><th class="num">MONTO (BS)</th></tr></thead>
+              <tbody id="gastosTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ESCENA 5: KARDEX -->
+        <div class="scene" data-scene="5">
+          <div class="page-title">Stock y Kardex</div>
+          <div class="page-subtitle">Cada material: cuánto entró, cuánto se usó, cuánto queda — al gramo</div>
+
+          <div class="kardex-grid">
+            <div class="stock-viz">
+              <div class="stock-title">📦 STOCK DISPONIBLE POR MATERIAL</div>
+              <div class="stock-bar">
+                <div class="stock-bar-label">🧱 Cemento Portland</div>
+                <div class="stock-bar-track"><div class="stock-bar-fill" data-stock="77" data-text="850 / 1050 bolsas">0</div></div>
+              </div>
+              <div class="stock-bar">
+                <div class="stock-bar-label">🏗 Hierro 12mm</div>
+                <div class="stock-bar-track"><div class="stock-bar-fill" data-stock="60" data-text="480 / 800 kg">0</div></div>
+              </div>
+              <div class="stock-bar">
+                <div class="stock-bar-label">🌊 Arena fina</div>
+                <div class="stock-bar-track"><div class="stock-bar-fill" data-stock="50" data-text="15 / 30 m³">0</div></div>
+              </div>
+              <div class="stock-bar">
+                <div class="stock-bar-label">⛰ Arena gruesa</div>
+                <div class="stock-bar-track"><div class="stock-bar-fill" data-stock="35" data-text="7 / 20 m³">0</div></div>
+              </div>
+              <div class="stock-bar">
+                <div class="stock-bar-label">🪨 Alquitrán</div>
+                <div class="stock-bar-track"><div class="stock-bar-fill" data-stock="100" data-text="20 / 20 kg">0</div></div>
+              </div>
+            </div>
+
+            <div class="stock-viz">
+              <div class="stock-title">📒 KARDEX · CEMENTO PORTLAND</div>
+              <table style="font-size: 11px;">
+                <thead>
+                  <tr><th>FECHA</th><th>CONCEPTO</th><th class="num">ENT.</th><th class="num">SAL.</th><th class="num">SALDO</th></tr>
+                </thead>
+                <tbody id="kardexTable">
+                  <!-- animado -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="stat-grid" style="margin-top: 14px;">
+            <div class="stat-callout">
+              <div class="stat-label">💰 VALOR EN ALMACÉN</div>
+              <div class="stat-value">Bs <span data-counter-kardex="0" data-decimals="2">0</span></div>
+            </div>
+            <div class="stat-callout green">
+              <div class="stat-label">📦 MATERIALES REGISTRADOS</div>
+              <div class="stat-value green"><span data-counter-kardex-b="0" data-decimals="0">0</span></div>
+            </div>
+            <div class="stat-callout orange">
+              <div class="stat-label">📊 MOVIMIENTOS ESTE MES</div>
+              <div class="stat-value" style="color:#f59e0b;"><span data-counter-kardex-c="0" data-decimals="0">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCENA 6: PLANILLAS -->
+        <div class="scene" data-scene="6">
+          <div class="page-title">Planillas de Mano de Obra</div>
+          <div class="page-subtitle">Retención del 10% calculada automáticamente — según práctica boliviana</div>
+
+          <div class="panel">
+            <table>
+              <thead><tr><th>N°</th><th>CONTRATISTA</th><th>PERÍODO</th><th class="num">SUBTOTAL</th><th class="num">RETENCIÓN</th><th class="num">NETO</th><th>ESTADO</th></tr></thead>
+              <tbody id="planillasTable"></tbody>
+            </table>
+          </div>
+
+          <div class="panel" style="background: linear-gradient(135deg, #1E2761 0%, #3D5AFE 100%); color: white; border: none;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+              <div>
+                <div style="font-size: 10px; letter-spacing: 1px; color: #CADCFC; font-weight: 600;">TOTAL A PAGAR</div>
+                <div class="mono" style="font-size: 24px; font-weight: 700; margin-top: 4px;">Bs <span data-counter-4="0" data-decimals="2">0</span></div>
+              </div>
+              <div>
+                <div style="font-size: 10px; letter-spacing: 1px; color: #CADCFC; font-weight: 600;">RETENCIONES (10%)</div>
+                <div class="mono" style="font-size: 24px; font-weight: 700; margin-top: 4px;">Bs <span data-counter-4b="0" data-decimals="2">0</span></div>
+              </div>
+              <div>
+                <div style="font-size: 10px; letter-spacing: 1px; color: #CADCFC; font-weight: 600;">PLANILLAS REGISTRADAS</div>
+                <div class="mono" style="font-size: 24px; font-weight: 700; margin-top: 4px;"><span data-counter-4c="0" data-decimals="0">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCENA 7: CURVA S (WOW MOMENT DRAMÁTICO) -->
+        <div class="scene" data-scene="7">
+          <div class="page-title">Dashboard · 6 días después</div>
+          <div class="page-subtitle">Todo lo registrado se consolida aquí — incluyendo lo que no querías ver</div>
+
+          <div class="kpi-row">
+            <div class="kpi-card accent-blue"><div class="kpi-label">PRESUPUESTO</div><div class="kpi-value">Bs 43.5M</div></div>
+            <div class="kpi-card accent-green"><div class="kpi-label">INGRESOS</div><div class="kpi-value green">Bs <span data-counter-5="0" data-decimals="0">0</span></div></div>
+            <div class="kpi-card accent-red"><div class="kpi-label">GASTOS</div><div class="kpi-value red">Bs <span data-counter-5b="0" data-decimals="0">0</span></div></div>
+            <div class="kpi-card accent-green"><div class="kpi-label">MARGEN</div><div class="kpi-value green"><span data-counter-5c="0" data-decimals="1">0</span>%</div><div class="kpi-sub">sobre ingresos</div></div>
+            <div class="kpi-card accent-purple"><div class="kpi-label">AVANCE REAL</div><div class="kpi-value"><span data-counter-5d="0" data-decimals="1">0</span>%</div></div>
+            <div class="kpi-card" style="border-left-color: #f56565;"><div class="kpi-label">DESVÍO CRONOGRAMA</div><div class="kpi-value red"><span data-counter-5e="0" data-decimals="2">0</span>%</div></div>
+          </div>
+
+          <div class="chart-container" id="curvaContainer">
+            <div class="chart-header">
+              <div style="font-size: 14px; font-weight: 600;">📉 Curva S — Avance programado vs real</div>
+              <div class="alert-badge" id="alertBadge">⚠ 45.58% ATRASADO</div>
+            </div>
+            <div class="legend">
+              <div class="legend-item"><div class="legend-swatch" style="background: #3D5AFE;"></div>Programado</div>
+              <div class="legend-item"><div class="legend-swatch" style="background: #f56565;"></div>Ejecutado real</div>
+            </div>
+            <svg viewBox="0 0 800 230" style="flex: 1; width: 100%;" id="curvaS">
+              <line x1="60" y1="30" x2="60" y2="195" stroke="#e2e8f0" stroke-width="1"/>
+              <line x1="60" y1="195" x2="780" y2="195" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="50" y="35" text-anchor="end" fill="#a0aec0" font-size="10">100%</text>
+              <text x="50" y="78" text-anchor="end" fill="#a0aec0" font-size="10">75%</text>
+              <text x="50" y="118" text-anchor="end" fill="#a0aec0" font-size="10">50%</text>
+              <text x="50" y="158" text-anchor="end" fill="#a0aec0" font-size="10">25%</text>
+              <text x="50" y="198" text-anchor="end" fill="#a0aec0" font-size="10">0%</text>
+              <line x1="60" y1="34" x2="780" y2="34" stroke="#edf2f7"/>
+              <line x1="60" y1="77" x2="780" y2="77" stroke="#edf2f7"/>
+              <line x1="60" y1="117" x2="780" y2="117" stroke="#edf2f7"/>
+              <line x1="60" y1="157" x2="780" y2="157" stroke="#edf2f7"/>
+              <text x="80" y="215" fill="#a0aec0" font-size="9">abr 26</text>
+              <text x="180" y="215" fill="#a0aec0" font-size="9">jun 26</text>
+              <text x="280" y="215" fill="#a0aec0" font-size="9">ago 26</text>
+              <text x="380" y="215" fill="#a0aec0" font-size="9">oct 26</text>
+              <text x="480" y="215" fill="#a0aec0" font-size="9">dic 26</text>
+              <text x="580" y="215" fill="#a0aec0" font-size="9">feb 27</text>
+              <text x="680" y="215" fill="#a0aec0" font-size="9">abr 27</text>
+              <path id="pathProgramado" d="M60,195 Q180,190 250,165 T450,95 T650,40 T780,32" stroke="#3D5AFE" stroke-width="2.5" fill="none" stroke-dasharray="1500" stroke-dashoffset="1500"/>
+              <path id="pathEjecutado" d="M60,195 L100,193 L140,191 L180,189 L220,187 L260,185 L300,184 L340,183" stroke="#f56565" stroke-width="2.5" fill="none" stroke-dasharray="600" stroke-dashoffset="600"/>
+              <circle cx="340" cy="183" r="5" fill="#f56565" id="endDot" style="opacity: 0;" class="pulse-dot"/>
+              <!-- Flecha dramática del gap -->
+              <g id="gapArrow" style="opacity: 0;">
+                <line x1="340" y1="183" x2="340" y2="105" stroke="#e53e3e" stroke-width="2" stroke-dasharray="4,3"/>
+                <text x="350" y="145" fill="#e53e3e" font-size="12" font-weight="700">GAP</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ESCENA 8: IA CONVERSACIONAL -->
+        <div class="scene" data-scene="8">
+          <div class="page-title">Pregúntale a la IA</div>
+          <div class="page-subtitle">Tu obra habla español — y te responde con datos reales</div>
+
+          <div class="chat-container">
+            <div id="chatMsgs"></div>
+            <div class="chat-input">
+              <input type="text" id="chatInput" placeholder="Escribe tu pregunta...">
+              <span class="send-icon">➤</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCENA 9: ESTADOS FINANCIEROS -->
+        <div class="scene" data-scene="9">
+          <div class="page-title">Estados financieros automáticos</div>
+          <div class="page-subtitle">Generados al instante — NB-NIIF Pyme · Listos para el contador</div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div class="panel" style="margin-bottom: 0;">
+              <div class="panel-title" style="justify-content: space-between;"><span>📈 Estado P&amp;G</span><span style="font-size: 10px; color: #a0aec0;">Al 21 abr 2026</span></div>
+              <table style="font-size: 11px;">
+                <tbody>
+                  <tr class="visible"><td style="color: #3D5AFE; font-weight: 600; padding: 6px 8px;">INGRESOS DE OPERACIÓN</td><td class="num" style="padding: 6px 8px;"></td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Ingresos por ejecución de obra</td><td class="num mono" style="padding: 4px 8px;">Bs 1.000.000,00</td></tr>
+                  <tr class="visible"><td style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px;">TOTAL INGRESOS</td><td class="num mono green" style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px;">Bs 1.000.000,00</td></tr>
+                  <tr class="visible"><td style="color: #3D5AFE; font-weight: 600; padding: 6px 8px;">GASTOS POR NATURALEZA</td><td></td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Materiales y suministros</td><td class="num mono red" style="padding: 4px 8px;">(Bs 81.350,00)</td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Gastos de personal</td><td class="num mono red" style="padding: 4px 8px;">(Bs 60.000,00)</td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Otros gastos operacionales</td><td class="num mono red" style="padding: 4px 8px;">(Bs 1.750,00)</td></tr>
+                  <tr class="visible"><td style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px;">RESULTADO OPERACIÓN</td><td class="num mono green" style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px; font-size: 13px;">Bs 856.900,00</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="panel" style="margin-bottom: 0;">
+              <div class="panel-title" style="justify-content: space-between;"><span>⚖️ Balance General</span><span style="font-size: 10px; color: #a0aec0;">NB-NIIF Pyme</span></div>
+              <table style="font-size: 11px;">
+                <tbody>
+                  <tr class="visible"><td style="color: #3D5AFE; font-weight: 600; padding: 6px 8px;">ACTIVO CORRIENTE</td><td></td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Banco BISA</td><td class="num mono" style="padding: 4px 8px;">Bs 767.650,00</td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Caja chica en obra</td><td class="num mono" style="padding: 4px 8px;">Bs 100.000,00</td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Inventario materiales</td><td class="num mono" style="padding: 4px 8px;">Bs 65.450,00</td></tr>
+                  <tr class="visible"><td style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px;">TOTAL ACTIVO</td><td class="num mono" style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px; font-size: 13px;">Bs 933.100,00</td></tr>
+                  <tr class="visible"><td style="color: #3D5AFE; font-weight: 600; padding: 6px 8px;">PASIVO</td><td></td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">Retenciones por pagar</td><td class="num mono" style="padding: 4px 8px;">Bs 6.000,00</td></tr>
+                  <tr class="visible"><td style="padding: 4px 8px; color: #4a5568;">IUE por pagar</td><td class="num mono" style="padding: 4px 8px;">Bs 214.225,00</td></tr>
+                  <tr class="visible"><td style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px;">TOTAL PAS. + PATR.</td><td class="num mono green" style="font-weight: 700; border-top: 1px solid #cbd5e0; padding: 6px 8px; font-size: 13px;">Bs 933.100,00</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" style="background: #c6f6d5; border: none; text-align: center; padding: 12px;">
+            <div style="color: #22543d; font-weight: 700; font-size: 13px;">✓ Balance cuadrado · Activo = Pasivo + Patrimonio · Exportable a PDF/Excel</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CURSOR VIRTUAL -->
+  <div class="cursor" id="cursor"></div>
+
+  <!-- CAPTION -->
+  <div class="caption" id="caption">
+    <div class="caption-chapter" id="captionChapter">CAPÍTULO 1 / 9</div>
+    <div id="captionText">Cargando...</div>
+  </div>
+
+  <!-- OUTRO -->
+  <div class="outro" id="outro">
+    <div class="outro-tag">HAS VISTO</div>
+    <div class="outro-title">Una obra completa,<br>de cero a estados financieros,<br><span class="outro-hi">todo en una sola plataforma.</span></div>
+    <div class="outro-sub">Imagina lo que ObrasApp hace en tu obra real.</div>
+    <a href="https://wa.me/59175438595?text=Hola%20Gad%2C%20vi%20la%20demo%20de%20ObrasApp%20y%20quisiera%20hablar%20sobre%20mi%20obra." target="_blank" class="outro-cta-btn">
+      <span class="wa-icon">💬</span>
+      <div class="outro-cta-text">
+        <div class="outro-cta-label">WHATSAPP DIRECTO</div>
+        <div class="outro-cta-number">+591 75438595</div>
+      </div>
+    </a>
+    <div class="outro-url">obrasbolivia.gadinca.com</div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<script>
+// ============================================================
+// AUDIO SYSTEM — Web Audio API (sin archivos externos)
+// ============================================================
+let audioCtx = null;
+let soundOn = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { console.warn('Audio no disponible'); }
+  }
+}
+
+// Efecto sonoro genérico (tono con envolvente ADSR)
+function playTone(freq, duration, type = 'sine', volume = 0.2, sweep = null) {
+  if (!soundOn || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  if (sweep) osc.frequency.exponentialRampToValueAtTime(sweep, audioCtx.currentTime + duration);
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+
+// Biblioteca de efectos
+const SFX = {
+  click: () => playTone(1200, 0.08, 'sine', 0.15),
+  type: () => playTone(800 + Math.random() * 200, 0.03, 'square', 0.04),
+  whoosh: () => playTone(120, 0.5, 'sine', 0.15, 800),
+  chapter: () => {
+    playTone(440, 0.15, 'sine', 0.18);
+    setTimeout(() => playTone(660, 0.25, 'sine', 0.18), 120);
+  },
+  cashRegister: () => {
+    playTone(1200, 0.08, 'square', 0.12);
+    setTimeout(() => playTone(1500, 0.08, 'square', 0.1), 80);
+    setTimeout(() => playTone(900, 0.2, 'square', 0.1), 160);
+  },
+  scan: () => playTone(400, 0.3, 'sawtooth', 0.08, 1200),
+  detected: () => {
+    playTone(1500, 0.06, 'sine', 0.1);
+    setTimeout(() => playTone(2000, 0.08, 'sine', 0.1), 50);
+  },
+  drama: () => {
+    // Alarma dramática descendente
+    playTone(800, 0.4, 'sawtooth', 0.2, 200);
+    setTimeout(() => playTone(600, 0.6, 'sawtooth', 0.25, 150), 100);
+  },
+  success: () => {
+    // Acorde ascendente
+    playTone(523, 0.15, 'sine', 0.15);
+    setTimeout(() => playTone(659, 0.15, 'sine', 0.15), 100);
+    setTimeout(() => playTone(784, 0.3, 'sine', 0.15), 200);
+  },
+  bubble: () => playTone(600, 0.1, 'sine', 0.08),
+};
+
+// ============================================================
+// CONFIG - 120s total distribuidos en 9 capítulos + transiciones
+// ============================================================
+// Transición entre caps: 5s (para leer título + subtítulo cómodamente)
+// Escenas: +2-3s cada una vs v2 para dar tiempo de lectura
+const TRANS_DURATION = 5000;  // duración del overlay de título (duplicado)
+const SCENES = [
+  { id: 1, duration: 10000, num: "CAPÍTULO 01", title: "La obra arranca", sub: "Todo en cero. Un nombre, una fecha y un presupuesto por delante.", caption: "La obra recién se registra — todo en cero", nav: "dashboard" },
+  { id: 2, duration: 13000, num: "CAPÍTULO 02", title: "Un equipo.\nSeis roles.", sub: "Multi-obra, multi-usuario. Cada persona ve solo lo que necesita.", caption: "Arquitectura multi-tenant con 6 roles predefinidos", nav: "usuarios" },
+  { id: 3, duration: 13000, num: "CAPÍTULO 03", title: "Llega el\nanticipo", sub: "Bs 1.000.000 del cliente. El primer ingreso. La obra respira.", caption: "Anticipo registrado — el reloj empieza a correr", nav: "ingresos" },
+  { id: 4, duration: 16000, num: "CAPÍTULO 04", title: "La factura\nse escanea sola", sub: "De la factura física a datos estructurados, sin escribir nada.", caption: "OCR identifica proveedor, NIT, monto y concepto", nav: "gastos" },
+  { id: 5, duration: 13000, num: "CAPÍTULO 05", title: "Almacén:\ntrazabilidad al gramo", sub: "Cuánto entró, cuánto se usó, cuánto queda. Por cada material.", caption: "Stock actualizado en tiempo real · Kardex con lotes", nav: "kardex" },
+  { id: 6, duration: 13000, num: "CAPÍTULO 06", title: "Planillas sin\ncalculadora", sub: "Retención del 10%, aportes, netos — calculados automáticamente.", caption: "4 contratistas · Bs 139.500 netos · Retenciones al día", nav: "planillas" },
+  { id: 7, duration: 18000, num: "CAPÍTULO 07", title: "El momento\nde la verdad", sub: "La Curva S no miente. Aunque duela verla.", caption: "45.58% atrasado — ahora lo sabes a tiempo para actuar", nav: "dashboard" },
+  { id: 8, duration: 13000, num: "CAPÍTULO 08", title: "Habla con\ntu obra", sub: "IA conversacional entrenada con tus datos reales.", caption: "Consulta cualquier cosa en español — respuestas en segundos", nav: "dashboard" },
+  { id: 9, duration: 11000, num: "CAPÍTULO 09", title: "Estados financieros\nque se arman solos", sub: "P&G y Balance generados automáticamente. Cuadrados. NB-NIIF.", caption: "Tu contador recibe los reportes listos, tú ahorras semanas", nav: "pyg" },
+];
+const TOTAL_MS = SCENES.reduce((a,s) => a + s.duration, 0) + SCENES.length * TRANS_DURATION;
+
+let currentScene = 0;
+let autoMode = true;
+let sceneTimer = null;
+let progressTimer = null;
+let elapsedMs = 0;
+let animationsRan = new Set();
+let startedAt = 0;
+let rafId = null;
+
+// ============================================================
+// HELPERS
+// ============================================================
+const $ = (q) => document.querySelector(q);
+const $$ = (q) => document.querySelectorAll(q);
+const cursor = $('#cursor');
+const caption = $('#caption');
+const progressBar = $('#progressBar');
+const intro = $('#intro');
+const chapterOverlay = $('#chapterOverlay');
+const outro = $('#outro');
+
+function moveCursor(x, y, callback) {
+  cursor.classList.add('visible');
+  cursor.style.left = x + 'px';
+  cursor.style.top = y + 'px';
+  if (callback) setTimeout(callback, 850);
+}
+function clickCursor() {
+  cursor.classList.add('clicking');
+  SFX.click();
+  setTimeout(() => cursor.classList.remove('clicking'), 500);
+}
+function hideCursor() { cursor.classList.remove('visible'); }
+
+function animateCounter(el, target, duration = 1500, decimals = 0) {
+  if (!el) return;
+  const start = parseFloat(el.textContent.replace(/\./g, '').replace(',', '.')) || 0;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = start + (target - start) * eased;
+    el.textContent = formatNum(value, decimals);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+function formatNum(n, decimals = 0) {
+  return n.toLocaleString('es-BO', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function typeInto(el, text, speed = 50, callback) {
+  el.value = '';
+  el.classList.add('highlight-input');
+  setTimeout(() => el.classList.remove('highlight-input'), 500);
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i < text.length) { el.value += text[i++]; SFX.type(); }
+    else { clearInterval(timer); if (callback) callback(); }
+  }, speed);
+}
+function addTableRow(tbody, html, highlight = false) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = html;
+  if (highlight) tr.classList.add('highlight');
+  tbody.appendChild(tr);
+  requestAnimationFrame(() => setTimeout(() => tr.classList.add('visible'), 10));
+  return tr;
+}
+
+// ============================================================
+// SCENE ANIMATIONS
+// ============================================================
+function runScene1() {
+  $$('.scene[data-scene="1"] [data-counter]').forEach(el => {
+    const target = parseFloat(el.dataset.counter);
+    const decimals = parseInt(el.dataset.decimals) || 0;
+    animateCounter(el, target, 1400, decimals);
+  });
+}
+
+function runScene2() {
+  const cards = $$('.role-card');
+  cards.forEach((card, i) => {
+    setTimeout(() => card.classList.add('visible'), 300 + i * 400);
+  });
+}
+
+function runScene3() {
+  setTimeout(() => {
+    const conceptoInput = $('#inputConcepto');
+    const cRect = conceptoInput.getBoundingClientRect();
+    moveCursor(cRect.left + 80, cRect.top + 15, () => {
+      clickCursor();
+      typeInto(conceptoInput, 'ANTICIPO CLIENTE', 45);
+    });
+  }, 600);
+
+  setTimeout(() => {
+    const montoInput = $('#inputMonto');
+    const mRect = montoInput.getBoundingClientRect();
+    moveCursor(mRect.left + 60, mRect.top + 15, () => {
+      clickCursor();
+      typeInto(montoInput, '1000000.00', 55);
+    });
+  }, 3800);
+
+  setTimeout(() => {
+    const btn = document.querySelector('.scene[data-scene="3"] .btn');
+    const bRect = btn.getBoundingClientRect();
+    moveCursor(bRect.left + 40, bRect.top + 15, () => {
+      clickCursor();
+      const tbody = $('#ingresosTable');
+      tbody.innerHTML = '';
+      addTableRow(tbody, `
+        <td>14 abr 2026</td>
+        <td><strong>ANTICIPO CLIENTE</strong></td>
+        <td><span class="badge badge-blue">Anticipo</span></td>
+        <td>🏦 BANCO BISA</td>
+        <td class="num mono green" style="font-weight: 700;">Bs 1.000.000,00</td>
+      `, true);
+      animateCounter(document.querySelector('[data-counter-2]'), 1000000, 1200, 2);
+      SFX.cashRegister();
+      $('#inputConcepto').value = '';
+      $('#inputMonto').value = '';
+      hideCursor();
+    });
+  }, 7000);
+}
+
+function runScene4() {
+  // Etapa 1: factura aparece en cámara
+  setTimeout(() => {
+    $('#scanBoxPlaceholder').style.display = 'none';
+    $('#scanFactura').style.display = 'block';
+    $('#scanBox').classList.add('scanning');
+    SFX.scan();
+  }, 400);
+
+  // Etapa 2: detección progresiva de campos
+  const fields = [
+    { id: 'field-prov', label: 'PROVEEDOR', value: 'FERRETERÍA NELLY', t: 1800 },
+    { id: 'field-nit', label: 'NIT', value: '1023456789', t: 2300 },
+    { id: 'field-factura', label: 'N° FACTURA', value: '00234', t: 2800 },
+    { id: 'field-concepto', label: 'CONCEPTO', value: 'Cemento Portland 50kg', t: 3300 },
+    { id: 'field-cant', label: 'CANTIDAD', value: '550 bolsas', t: 3800 },
+    { id: 'field-monto', label: 'MONTO TOTAL', value: 'Bs 39.600,00', t: 4300 },
+  ];
+  fields.forEach(f => {
+    setTimeout(() => {
+      const el = $('#' + f.id);
+      el.classList.add('detected');
+      el.querySelector('.scan-field-value').textContent = f.value;
+      SFX.detected();
+    }, f.t);
+  });
+
+  // Etapa 3: el scan se "apaga"
+  setTimeout(() => $('#scanBox').classList.remove('scanning'), 5000);
+
+  // Etapa 4: aparecen filas en la tabla
+  const gastos = [
+    { fecha: '15 abr', concepto: 'CEMENTO PORTLAND IP-30', cat: 'Materiales', prov: 'Ferretería Nelly', cant: '550 bolsas', monto: 39600, catClass: 'yellow' },
+    { fecha: '16 abr', concepto: 'ARENA FINA', cat: 'Materiales', prov: 'Áridos El Torno', cant: '30 m³', monto: 2250, catClass: 'yellow' },
+    { fecha: '17 abr', concepto: 'HIERRO CORRUGADO 12mm', cat: 'Materiales', prov: 'ACERO SA', cant: '800 kg', monto: 37000, catClass: 'yellow' },
+    { fecha: '19 abr', concepto: 'BOLETA CUMPLIMIENTO', cat: 'Otros', prov: 'Banco Bisa', cant: '1 glb', monto: 1750, catClass: 'red' },
+  ];
+  const tbody = $('#gastosTable');
+  tbody.innerHTML = '';
+  gastos.forEach((g, i) => {
+    setTimeout(() => {
+      const badgeClass = g.catClass === 'yellow' ? 'badge-yellow' : g.catClass === 'red' ? 'badge-red' : 'badge-green';
+      addTableRow(tbody, `
+        <td>${g.fecha} 2026</td>
+        <td><strong>${g.concepto}</strong></td>
+        <td><span class="badge ${badgeClass}">${g.cat}</span></td>
+        <td>${g.prov}</td>
+        <td class="num">${g.cant}</td>
+        <td class="num mono red" style="font-weight: 700;">Bs ${formatNum(g.monto, 2)}</td>
+      `, true);
+    }, 5800 + i * 1400);
+  });
+}
+
+function runScene5() {
+  // Barras de stock
+  $$('.stock-bar-fill').forEach((bar, i) => {
+    setTimeout(() => {
+      const target = parseFloat(bar.dataset.stock);
+      bar.style.width = target + '%';
+      bar.textContent = bar.dataset.text;
+    }, 400 + i * 200);
+  });
+
+  // Kardex tabla
+  const kardex = [
+    { fecha: '15 abr', concepto: 'Compra inicial', ent: 1050, sal: 0, saldo: 1050 },
+    { fecha: '17 abr', concepto: 'Distribuido a zapatas', ent: 0, sal: 120, saldo: 930 },
+    { fecha: '18 abr', concepto: 'Distribuido a muros', ent: 0, sal: 50, saldo: 880 },
+    { fecha: '20 abr', concepto: 'Distribuido a losa', ent: 0, sal: 30, saldo: 850 },
+  ];
+  const tbody = $('#kardexTable');
+  tbody.innerHTML = '';
+  kardex.forEach((k, i) => {
+    setTimeout(() => {
+      addTableRow(tbody, `
+        <td>${k.fecha}</td>
+        <td>${k.concepto}</td>
+        <td class="num green">${k.ent || '—'}</td>
+        <td class="num red">${k.sal || '—'}</td>
+        <td class="num mono" style="font-weight:700;">${k.saldo}</td>
+      `, false);
+    }, 1500 + i * 1200);
+  });
+
+  // Contadores
+  setTimeout(() => animateCounter(document.querySelector('[data-counter-kardex]'), 87600, 1400, 2), 2000);
+  setTimeout(() => animateCounter(document.querySelector('[data-counter-kardex-b]'), 5, 800, 0), 2200);
+  setTimeout(() => animateCounter(document.querySelector('[data-counter-kardex-c]'), 23, 800, 0), 2400);
+}
+
+function runScene6() {
+  const planillas = [
+    { id: 'PL-001', contrat: 'Juan Quispe', oficio: 'Albañil', periodo: '10-16 abr', subtotal: 60000, reten: 6000, neto: 54000 },
+    { id: 'PL-002', contrat: 'Miguel Mamani', oficio: 'Electricista', periodo: '10-16 abr', subtotal: 28000, reten: 2800, neto: 25200 },
+    { id: 'PL-003', contrat: 'Carlos Flores', oficio: 'Plomero', periodo: '10-16 abr', subtotal: 22000, reten: 2200, neto: 19800 },
+    { id: 'PL-004', contrat: 'Roberto Condori', oficio: 'Maestro albañil', periodo: '10-16 abr', subtotal: 45000, reten: 4500, neto: 40500 },
+  ];
+  const tbody = $('#planillasTable');
+  tbody.innerHTML = '';
+  let totalNeto = 0, totalReten = 0, count = 0;
+  planillas.forEach((p, i) => {
+    setTimeout(() => {
+      addTableRow(tbody, `
+        <td><strong>${p.id}</strong></td>
+        <td><strong>${p.contrat}</strong><br><span style="font-size: 10px; color: #a0aec0;">${p.oficio}</span></td>
+        <td>${p.periodo}</td>
+        <td class="num mono">Bs ${formatNum(p.subtotal, 2)}</td>
+        <td class="num mono red">Bs ${formatNum(p.reten, 2)}</td>
+        <td class="num mono green" style="font-weight: 700;">Bs ${formatNum(p.neto, 2)}</td>
+        <td><span class="badge badge-blue">Registrada</span></td>
+      `, true);
+      totalNeto += p.neto; totalReten += p.reten; count++;
+      animateCounter(document.querySelector('[data-counter-4]'), totalNeto, 800, 2);
+      animateCounter(document.querySelector('[data-counter-4b]'), totalReten, 800, 2);
+      animateCounter(document.querySelector('[data-counter-4c]'), count, 500, 0);
+    }, 600 + i * 1700);
+  });
+}
+
+function runScene7() {
+  // KPIs
+  const values = [
+    { sel: '[data-counter-5]', target: 1000000, decimals: 0 },
+    { sel: '[data-counter-5b]', target: 137100, decimals: 0 },
+    { sel: '[data-counter-5c]', target: 86.3, decimals: 1 },
+    { sel: '[data-counter-5d]', target: 8, decimals: 1 },
+    { sel: '[data-counter-5e]', target: 45.58, decimals: 2 },
+  ];
+  values.forEach((v, i) => {
+    setTimeout(() => animateCounter(document.querySelector(v.sel), v.target, 1400, v.decimals), 300 + i * 180);
+  });
+
+  // Curva S programada (sube esperanzadora)
+  setTimeout(() => {
+    const progPath = $('#pathProgramado');
+    progPath.style.transition = 'stroke-dashoffset 2.8s ease-out';
+    progPath.style.strokeDashoffset = '0';
+  }, 1800);
+
+  // Curva S ejecutada (plana, dolorosa)
+  setTimeout(() => {
+    const ejecPath = $('#pathEjecutado');
+    ejecPath.style.transition = 'stroke-dashoffset 2s ease-out';
+    ejecPath.style.strokeDashoffset = '0';
+  }, 5000);
+
+  // Punto rojo pulsando
+  setTimeout(() => {
+    $('#endDot').style.opacity = '1';
+  }, 7000);
+
+  // Flecha GAP
+  setTimeout(() => {
+    const gap = $('#gapArrow');
+    gap.style.transition = 'opacity 0.8s';
+    gap.style.opacity = '1';
+  }, 7500);
+
+  // Alert dramático
+  setTimeout(() => {
+    $('#alertBadge').classList.add('show');
+    SFX.drama();
+    // zoom dramático al contenedor
+    $('#curvaContainer').classList.add('dramatic-zoom');
+  }, 8500);
+}
+
+function runScene8() {
+  const messages = [
+    { type: 'user', text: '¿Cuánto llevo gastado en cemento?', t: 400 },
+    { type: 'ai-typing', t: 1500, duration: 1200 },
+    { type: 'ai', text: 'En abril llevas <strong>Bs 39.600</strong> en cemento Portland. Tienes 850 bolsas disponibles de las 1.050 compradas (20% consumido en 6 días).', t: 2800 },
+    { type: 'user', text: '¿Quién cobró más esta semana?', t: 4200 },
+    { type: 'ai-typing', t: 5200, duration: 1000 },
+    { type: 'ai', text: '<strong>Juan Quispe</strong> (albañil, PL-001): <strong>Bs 54.000</strong> netos tras retención del 10%. Le sigue Roberto Condori con Bs 40.500.', t: 6300 },
+    { type: 'user', text: '¿Estoy dentro del cronograma?', t: 7700 },
+    { type: 'ai-typing', t: 8600, duration: 900 },
+    { type: 'ai', text: '⚠️ <strong>No.</strong> Llevas 45.58% de atraso respecto al programado. Te recomiendo revisar las partidas estructurales pendientes.', t: 9600 },
+  ];
+
+  const chatMsgs = $('#chatMsgs');
+  chatMsgs.innerHTML = '';
+  let currentTyping = null;
+
+  messages.forEach(m => {
+    setTimeout(() => {
+      if (m.type === 'ai-typing') {
+        currentTyping = document.createElement('div');
+        currentTyping.className = 'chat-msg ai visible';
+        currentTyping.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+        chatMsgs.appendChild(currentTyping);
+        setTimeout(() => {
+          if (currentTyping && currentTyping.parentNode) currentTyping.remove();
+        }, m.duration);
+      } else {
+        const msg = document.createElement('div');
+        msg.className = 'chat-msg ' + m.type;
+        msg.innerHTML = m.text;
+        chatMsgs.appendChild(msg);
+        SFX.bubble();
+        requestAnimationFrame(() => setTimeout(() => msg.classList.add('visible'), 10));
+      }
+    }, m.t);
+  });
+}
+
+function runScene9() {
+  SFX.success();
+  const rows = $$('.scene[data-scene="9"] tr');
+  rows.forEach((row, i) => {
+    row.style.opacity = '0';
+    row.style.transform = 'translateY(8px)';
+    row.style.transition = 'all 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => {
+      row.style.opacity = '1';
+      row.style.transform = 'translateY(0)';
+    }, 80 + i * 100);
+  });
+}
+
+// ============================================================
+// SCENE CONTROLLER
+// ============================================================
+function showChapterTransition(scene, callback) {
+  SFX.whoosh();
+  $('#chapterNumber').textContent = scene.num;
+  $('#chapterTitle').innerHTML = scene.title.replace(/\n/g, '<br>');
+  $('#chapterSub').textContent = scene.sub;
+
+  chapterOverlay.classList.add('visible');
+  hideCursor();
+
+  // Sonido del título aparece ~0.4s después del whoosh
+  setTimeout(() => SFX.chapter(), 400);
+
+  setTimeout(() => {
+    chapterOverlay.classList.remove('visible');
+    setTimeout(callback, 400);
+  }, TRANS_DURATION);
+}
+
+function activateScene(idx, skipTransition = false) {
+  if (idx < 0 || idx >= SCENES.length) return;
+  currentScene = idx;
+  const scene = SCENES[idx];
+
+  const doActivation = () => {
+    // Quitar active de todas
+    $$('.scene').forEach(s => s.classList.remove('active'));
+    $$('.sidebar-item').forEach(s => s.classList.remove('active'));
+
+    // Activar escena
+    const sceneEl = document.querySelector(`.scene[data-scene="${scene.id}"]`);
+    if (sceneEl) sceneEl.classList.add('active');
+    const navItem = document.querySelector(`.sidebar-item[data-nav="${scene.nav}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    // Caption
+    caption.classList.remove('visible');
+    setTimeout(() => {
+      $('#captionChapter').textContent = `CAPÍTULO ${idx + 1} / ${SCENES.length}`;
+      $('#captionText').textContent = scene.caption;
+      caption.classList.add('visible');
+    }, 200);
+
+    updateDots();
+
+    // Ejecutar animación
+    if (!animationsRan.has(idx)) {
+      setTimeout(() => {
+        const fns = [runScene1, runScene2, runScene3, runScene4, runScene5, runScene6, runScene7, runScene8, runScene9];
+        if (fns[idx]) fns[idx]();
+        animationsRan.add(idx);
+      }, 400);
+    }
+
+    // Progress bar
+    resetProgress();
+    if (autoMode) startProgress(scene.duration);
+
+    // Auto-avanzar
+    clearTimeout(sceneTimer);
+    if (autoMode) {
+      sceneTimer = setTimeout(() => {
+        if (currentScene < SCENES.length - 1) activateScene(currentScene + 1);
+        else showOutroAndRestart();
+      }, scene.duration);
+    }
+  };
+
+  if (skipTransition) {
+    doActivation();
+  } else {
+    showChapterTransition(scene, doActivation);
+  }
+}
+
+function showOutroAndRestart() {
+  outro.classList.add('visible');
+  // Queda 10 segundos visible para dar tiempo de hacer click en WhatsApp,
+  // luego reinicia automáticamente para loop continuo (ideal para ad)
+  setTimeout(() => {
+    outro.classList.remove('visible');
+    setTimeout(() => restart(), 600);
+  }, 10000);
+}
+
+function updateDots() {
+  const dotsEl = $('#sceneDots');
+  dotsEl.innerHTML = '';
+  SCENES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    if (i === currentScene) d.classList.add('active');
+    else if (i < currentScene) d.classList.add('done');
+    dotsEl.appendChild(d);
+  });
+}
+
+function resetProgress() {
+  clearInterval(progressTimer);
+  progressBar.style.width = '0%';
+  progressBar.style.transition = 'none';
+}
+function startProgress(duration) {
+  setTimeout(() => {
+    progressBar.style.transition = `width ${duration}ms linear`;
+    progressBar.style.width = '100%';
+  }, 50);
+}
+
+// Timer global
+function updateTimeDisplay() {
+  const totalSec = Math.floor(TOTAL_MS / 1000);
+  const currSec = Math.floor(elapsedMs / 1000);
+  const mm = (n) => String(Math.floor(n / 60)).padStart(2, '0');
+  const ss = (n) => String(n % 60).padStart(2, '0');
+  $('#timeDisplay').textContent = `${mm(currSec)}:${ss(currSec)} / ${mm(totalSec)}:${ss(totalSec)}`;
+}
+function tickTimer() {
+  if (autoMode && startedAt > 0) {
+    elapsedMs = performance.now() - startedAt;
+    if (elapsedMs >= TOTAL_MS) elapsedMs = TOTAL_MS;
+    updateTimeDisplay();
+  }
+  rafId = requestAnimationFrame(tickTimer);
+}
+
+function restart() {
+  currentScene = 0;
+  animationsRan.clear();
+  elapsedMs = 0;
+  startedAt = performance.now();
+
+  ['ingresosTable', 'gastosTable', 'planillasTable', 'kardexTable', 'chatMsgs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+  $$('[data-counter], [data-counter-2], [data-counter-4], [data-counter-4b], [data-counter-4c], [data-counter-5], [data-counter-5b], [data-counter-5c], [data-counter-5d], [data-counter-5e], [data-counter-kardex], [data-counter-kardex-b], [data-counter-kardex-c]').forEach(el => el.textContent = '0');
+  $$('.kpi-bar-fill').forEach(b => b.style.width = '0%');
+  $$('.stock-bar-fill').forEach(b => { b.style.width = '0%'; b.textContent = ''; });
+  $$('.scan-field').forEach(f => { f.classList.remove('detected'); f.querySelector('.scan-field-value').textContent = '—'; });
+  $$('.role-card').forEach(c => c.classList.remove('visible'));
+  $('#scanBoxPlaceholder').style.display = 'flex';
+  $('#scanFactura').style.display = 'none';
+  $('#scanBox').classList.remove('scanning');
+  const prog = $('#pathProgramado'); if (prog) { prog.style.transition = 'none'; prog.style.strokeDashoffset = '1500'; }
+  const ejec = $('#pathEjecutado'); if (ejec) { ejec.style.transition = 'none'; ejec.style.strokeDashoffset = '600'; }
+  const dot = $('#endDot'); if (dot) dot.style.opacity = '0';
+  const gap = $('#gapArrow'); if (gap) gap.style.opacity = '0';
+  $('#alertBadge').classList.remove('show');
+  $('#curvaContainer').classList.remove('dramatic-zoom');
+  hideCursor();
+  activateScene(0);
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+$('#btnSound').addEventListener('click', (e) => {
+  initAudio();
+  soundOn = !soundOn;
+  e.target.textContent = soundOn ? '🔊 SONIDO' : '🔇 SONIDO';
+  e.target.classList.toggle('active', soundOn);
+  // Beep de confirmación al activar
+  if (soundOn) SFX.detected();
+});
+
+$('#btnMode').addEventListener('click', (e) => {
+  autoMode = !autoMode;
+  e.target.textContent = autoMode ? '▶ AUTO' : '⏸ MANUAL';
+  e.target.classList.toggle('active', !autoMode);
+  if (autoMode) {
+    const scene = SCENES[currentScene];
+    resetProgress();
+    startProgress(scene.duration);
+    clearTimeout(sceneTimer);
+    sceneTimer = setTimeout(() => {
+      if (currentScene < SCENES.length - 1) activateScene(currentScene + 1);
+      else showOutroAndRestart();
+    }, scene.duration);
+  } else {
+    clearTimeout(sceneTimer);
+    resetProgress();
+  }
+});
+$('#btnNext').addEventListener('click', () => {
+  if (currentScene < SCENES.length - 1) activateScene(currentScene + 1);
+  else showOutroAndRestart();
+});
+$('#btnPrev').addEventListener('click', () => {
+  if (currentScene > 0) activateScene(currentScene - 1);
+});
+$('#btnRestart').addEventListener('click', () => restart());
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', () => {
+  updateDots();
+  setTimeout(() => {
+    intro.classList.add('hidden');
+    startedAt = performance.now();
+    rafId = requestAnimationFrame(tickTimer);
+    setTimeout(() => {
+      intro.style.display = 'none';
+      activateScene(0, false);
+    }, 800);
+  }, 2800);
+});
+</script>
+
+<!-- BOTÓN VOLVER A GADINCA.COM -->
+<style>
+#back-to-portfolio {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10,14,20,0.92);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+  padding: 10px 22px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  cursor: pointer;
+  white-space: nowrap;
+}
+#back-to-portfolio:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+#back-to-portfolio svg {
+  width: 15px;
+  height: 15px;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.3s;
+}
+#back-to-portfolio:hover svg {
+  opacity: 1;
+  transform: translateX(-3px);
+}
+</style>
+
+<a id="back-to-portfolio" href="https://gadinca.com">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  Volver a gadinca.com
+</a>
+
+</body>
+</html>
