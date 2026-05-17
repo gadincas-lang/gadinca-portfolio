@@ -1231,324 +1231,43 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   line-height:1.7;max-width:280px;margin:0 auto;
 }
 
+.productos-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.prod-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(200,164,90,0.2);
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: var(--steel2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+.prod-item:hover {
+  border-color: rgba(200,164,90,0.6);
+  color: var(--g2);
+  background: rgba(200,164,90,0.06);
+}
+.prod-item img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 4px;
+}
 
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     OBRAS APP POPUP PROMOCIONAL
-═══════════════════════════════════════════ -->
-<style>
-#obras-overlay{
-  position:fixed;inset:0;z-index:9990;
-  background:rgba(0,0,0,0.85);
-  backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;
-  padding:1rem;
-  animation:overlayIn 0.4s ease forwards;
-}
-@keyframes overlayIn{from{opacity:0}to{opacity:1}}
-#obras-overlay.closing{animation:overlayOut 0.35s ease forwards}
-@keyframes overlayOut{to{opacity:0;pointer-events:none}}
-
-#obras-popup{
-  background:linear-gradient(145deg,#0a1628 0%,#0d1f3c 50%,#0a1628 100%);
-  border:1px solid rgba(74,143,212,0.25);
-  border-radius:16px;
-  max-width:580px;width:100%;
-  position:relative;
-  box-shadow:0 0 60px rgba(74,143,212,0.15),0 30px 80px rgba(0,0,0,0.6);
-  animation:popupIn 0.5s cubic-bezier(0.16,1,0.3,1) 0.1s both;
-  overflow:hidden;
-}
-@keyframes popupIn{
-  from{opacity:0;transform:translateY(30px) scale(0.96)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
-#obras-popup::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(74,143,212,0.6),rgba(37,211,102,0.4),transparent);
-}
-.op-glow{
-  position:absolute;top:-60px;right:-60px;
-  width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle,rgba(74,143,212,0.12) 0%,transparent 70%);
-  pointer-events:none;
-}
-.op-body{padding:2rem 2rem 1.8rem;}
-
-/* close */
-.op-close{
-  position:absolute;top:14px;right:14px;
-  width:32px;height:32px;
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(255,255,255,0.5);
-  font-size:14px;transition:all 0.2s;
-  z-index:2;
-}
-.op-close:hover{background:rgba(255,255,255,0.12);color:#fff;transform:scale(1.1)}
-
-/* header */
-.op-header{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
-.op-app-icon{
-  width:44px;height:44px;border-radius:10px;
-  background:linear-gradient(135deg,#1a56a8,#4A8FD4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;flex-shrink:0;
-  box-shadow:0 4px 16px rgba(74,143,212,0.3);
-}
-.op-app-name{font-size:1.3rem;font-weight:700;color:#fff;font-family:'Raleway',sans-serif;}
-.op-badge{
-  margin-left:auto;
-  background:linear-gradient(135deg,#0d7a3a,#25D366);
-  color:#fff;font-size:0.55rem;font-weight:600;
-  letter-spacing:0.12em;text-transform:uppercase;
-  padding:0.3rem 0.7rem;border-radius:20px;
-  white-space:nowrap;
-}
-
-/* headline */
-.op-headline{
-  font-size:1.5rem;font-weight:700;
-  color:#fff;line-height:1.2;
-  font-family:'Raleway',sans-serif;
-  margin-bottom:0.6rem;
-}
-.op-headline em{font-style:normal;color:#4A8FD4}
-.op-sub{
-  font-size:0.88rem;color:rgba(180,200,230,0.7);
-  line-height:1.6;margin-bottom:1.4rem;
-  font-family:'Raleway',sans-serif;font-weight:300;
-}
-
-/* features grid */
-.op-features{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:8px;margin-bottom:1.4rem;
-}
-.op-feat{
-  background:rgba(74,143,212,0.06);
-  border:1px solid rgba(74,143,212,0.12);
-  border-radius:8px;padding:0.7rem 0.8rem;
-  display:flex;align-items:flex-start;gap:8px;
-  transition:border-color 0.2s;
-}
-.op-feat:hover{border-color:rgba(74,143,212,0.3)}
-.op-feat-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
-.op-feat-text{}
-.op-feat-name{font-size:0.75rem;font-weight:600;color:#e0eeff;font-family:'Raleway',sans-serif}
-.op-feat-desc{font-size:0.65rem;color:rgba(140,170,210,0.7);line-height:1.4;font-family:'Raleway',sans-serif}
-
-/* stats */
-.op-stats{
-  display:flex;gap:0;
-  border:1px solid rgba(74,143,212,0.12);
-  border-radius:8px;overflow:hidden;
-  margin-bottom:1.4rem;
-}
-.op-stat{
-  flex:1;padding:0.6rem 0.5rem;text-align:center;
-  border-right:1px solid rgba(74,143,212,0.12);
-}
-.op-stat:last-child{border-right:none}
-.op-stat-n{font-size:1.2rem;font-weight:700;color:#4A8FD4;font-family:'Raleway',sans-serif;line-height:1}
-.op-stat-l{font-size:0.52rem;color:rgba(140,170,210,0.6);letter-spacing:0.08em;text-transform:uppercase;font-family:'Raleway',sans-serif}
-
-/* actions */
-.op-actions{display:flex;gap:10px;align-items:center;}
-.op-btn-primary{
-  flex:1;
-  background:linear-gradient(135deg,#1a56a8,#4A8FD4);
-  color:#fff;border:none;
-  padding:0.85rem 1.2rem;
-  border-radius:8px;
-  font-size:0.78rem;font-weight:600;
-  letter-spacing:0.08em;text-transform:uppercase;
-  cursor:pointer;text-decoration:none;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:all 0.3s;
-  font-family:'Raleway',sans-serif;
-  box-shadow:0 4px 20px rgba(74,143,212,0.3);
-}
-.op-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(74,143,212,0.5)}
-.op-btn-secondary{
-  padding:0.85rem 1.2rem;
-  background:transparent;
-  border:1px solid rgba(255,255,255,0.15);
-  color:rgba(255,255,255,0.5);
-  border-radius:8px;
-  font-size:0.72rem;
-  cursor:pointer;
-  white-space:nowrap;
-  transition:all 0.2s;
-  font-family:'Raleway',sans-serif;
-}
-.op-btn-secondary:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)}
-
-.op-url{
-  text-align:center;margin-top:0.8rem;
-  font-size:0.62rem;color:rgba(74,143,212,0.5);
-  font-family:'Raleway',sans-serif;letter-spacing:0.06em;
-}
-.op-btn-wa{
-  flex:1;
-  background:linear-gradient(135deg,#128c3e,#25D366);
-  color:#fff;border:none;
-  padding:0.85rem 1rem;
-  border-radius:8px;
-  font-size:0.78rem;font-weight:600;
-  letter-spacing:0.06em;text-transform:uppercase;
-  cursor:pointer;text-decoration:none;
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  transition:all 0.3s;
-  font-family:'Raleway',sans-serif;
-  box-shadow:0 4px 20px rgba(37,211,102,0.25);
-}
-.op-btn-wa:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(37,211,102,0.45)}
-.op-footer{
-  display:flex;align-items:center;
-  justify-content:space-between;
-  margin-top:0.9rem;
-  padding-top:0.9rem;
-  border-top:1px solid rgba(74,143,212,0.1);
-}
-.op-skip{
-  background:none;border:none;
-  color:rgba(255,255,255,0.35);
-  font-size:0.68rem;cursor:pointer;
-  font-family:'Raleway',sans-serif;
-  transition:color 0.2s;letter-spacing:0.04em;
-  padding:0;
-}
-.op-skip:hover{color:rgba(255,255,255,0.6)}
-.op-url-link{
-  font-size:0.62rem;color:rgba(74,143,212,0.5);
-  font-family:'Raleway',sans-serif;letter-spacing:0.06em;
-  text-decoration:none;transition:color 0.2s;
-}
-.op-url-link:hover{color:#4A8FD4}
-
-@media(max-width:560px){
-  .op-body{padding:1.4rem 1.2rem 1.4rem}
-  .op-features{grid-template-columns:1fr}
-  .op-headline{font-size:1.2rem}
-  .op-actions{flex-direction:column}
-  .op-btn-primary,.op-btn-secondary{width:100%;justify-content:center}
-}
-</style>
-
-<div id="obras-overlay">
-  <div id="obras-popup">
-    <div class="op-glow"></div>
-    <button class="op-close" onclick="closeObrasPopup()" aria-label="Cerrar">✕</button>
-    <div class="op-body">
-
-      <!-- Header -->
-      <div class="op-header">
-        <div class="op-app-icon">🏗️</div>
-        <div class="op-app-name">ObrasApp</div>
-        <div class="op-badge">✦ Disponible ahora</div>
-      </div>
-
-      <!-- Headline -->
-      <div class="op-headline">
-        Controlá tu obra<br>desde <em>cualquier lugar</em>
-      </div>
-      <div class="op-sub">
-        Presupuestos, gastos, planillas y cronogramas. Todo en una sola plataforma con inteligencia artificial — diseñada para constructoras bolivianas.
-      </div>
-
-      <!-- Features -->
-      <div class="op-features">
-        <div class="op-feat">
-          <div class="op-feat-icon">📊</div>
-          <div class="op-feat-text">
-            <div class="op-feat-name">Dashboard inteligente</div>
-            <div class="op-feat-desc">Curva S, costos y avance real</div>
-          </div>
-        </div>
-        <div class="op-feat">
-          <div class="op-feat-icon">💰</div>
-          <div class="op-feat-text">
-            <div class="op-feat-name">Contabilidad NB-NIIF</div>
-            <div class="op-feat-desc">P&G, Balance, Flujo de Caja</div>
-          </div>
-        </div>
-        <div class="op-feat">
-          <div class="op-feat-icon">🤖</div>
-          <div class="op-feat-text">
-            <div class="op-feat-name">Chat con IA</div>
-            <div class="op-feat-desc">"¿Cuánto cemento queda?" →</div>
-          </div>
-        </div>
-        <div class="op-feat">
-          <div class="op-feat-icon">📱</div>
-          <div class="op-feat-text">
-            <div class="op-feat-name">Desde el celular</div>
-            <div class="op-feat-desc">Registrá gastos sin laptop</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="op-stats">
-        <div class="op-stat">
-          <div class="op-stat-n">6</div>
-          <div class="op-stat-l">Roles</div>
-        </div>
-        <div class="op-stat">
-          <div class="op-stat-n">15+</div>
-          <div class="op-stat-l">Módulos</div>
-        </div>
-        <div class="op-stat">
-          <div class="op-stat-n">5</div>
-          <div class="op-stat-l">Reportes PDF</div>
-        </div>
-        <div class="op-stat">
-          <div class="op-stat-n">IA</div>
-          <div class="op-stat-l">Chat incluido</div>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="op-actions">
-        <a href="https://gadinca.com/demo" target="_blank" class="op-btn-primary">
-          ▶ Ver demo interactivo
-        </a>
-        <a href="https://wa.me/59175438595?text=Hola%20Gad%2C%20vi%20ObrasApp%20en%20tu%20portafolio%20y%20me%20interesa%20saber%20m%C3%A1s%20sobre%20el%20software%20para%20gesti%C3%B3n%20de%20obras.%20%C2%BFPod%C3%A9s%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" class="op-btn-wa">
-          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.123 1.528 5.856L.057 23.886l6.162-1.616A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.931a9.88 9.88 0 01-5.031-1.378l-.361-.214-3.741.981 1-3.638-.235-.374A9.868 9.868 0 012.069 12C2.069 6.488 6.488 2.069 12 2.069S21.931 6.488 21.931 12c0 5.513-4.419 9.931-9.931 9.931z"/></svg>
-          Consultar por WhatsApp
-        </a>
-      </div>
-
-      <div class="op-footer">
-        <button onclick="closeObrasPopup()" class="op-skip">Ver portafolio →</button>
-        <a href="https://gadinca.com/obrasapp" target="_blank" class="op-url-link">Ver página de ObrasApp →</a>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<script>
-function closeObrasPopup(){
-  var overlay=document.getElementById('obras-overlay');
-  overlay.classList.add('closing');
-  setTimeout(function(){overlay.style.display='none'},350);
-}
-// Auto-close on ESC
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape') closeObrasPopup();
-});
-// Close clicking outside popup
-document.getElementById('obras-overlay').addEventListener('click',function(e){
-  if(e.target===this) closeObrasPopup();
-});
-</script>
-<!-- ═══════════════════════════════════════════ -->
 
 <div class="cur" id="cur"></div>
 <div class="cur-r" id="cur-r"></div>
@@ -1588,6 +1307,20 @@ document.getElementById('obras-overlay').addEventListener('click',function(e){
   <div class="hero-left" style="position:relative;z-index:5">
     <div class="hero-eyebrow">Ingeniero Civil · Construcción &amp; Supervisión · Bolivia</div>
     <h1 class="hero-h1">
+    <div class="productos-bar">
+      <a href="https://obrasbolivia.gadinca.com" target="_blank" class="prod-item">
+        <img src="LOGO OBRAS APP.jpeg" alt="ObrasApp">
+        <span>ObrasApp</span>
+      </a>
+      <a href="https://quantia.gadinca.com" target="_blank" class="prod-item">
+        <img src="LOGO QUANTIA.png" alt="Quantia">
+        <span>Quantia</span>
+      </a>
+      <a href="/catalogo.html" target="_blank" class="prod-item">
+        <img src="LOGO CATALOGO APUS.png" alt="Catálogo APUs">
+        <span>Catálogo APUs</span>
+      </a>
+    </div>
       <span class="hline-1">Gad Josue</span>
       <span class="hline-2 grad" style="font-size:1.15em;letter-spacing:.06em">Inca Saavedra</span>
     </h1>
