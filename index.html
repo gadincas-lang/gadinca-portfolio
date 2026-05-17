@@ -347,6 +347,7 @@ textarea.f-input{resize:vertical;min-height:90px}
 footer{background:var(--black);border-top:1px solid var(--border2);padding:1.8rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
 footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g1),var(--blue),transparent);opacity:.2}
 .f-logo{font-family:var(--font-title);font-size:.95rem;font-weight:600;color:var(--g2)}
+.f-logo-img{width:36px;height:36px;object-fit:contain;border-radius:6px;background:transparent;mix-blend-mode:multiply}
 .f-copy{font-family:var(--font-mono);font-size:.58rem;color:var(--steel)}
 .f-socials{display:flex;gap:.5rem}
 .slink{width:30px;height:30px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--steel);font-size:.62rem;font-family:var(--font-mono);text-decoration:none;transition:all .3s;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
@@ -370,6 +371,8 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   50%      { filter:drop-shadow(0 0 12px rgba(200,164,90,.7)); }
 }
 .nav-logo-img {
+  width:40px;height:40px;object-fit:contain;border-radius:6px;
+  background:transparent;mix-blend-mode:multiply;
   animation: logoSpin .8s cubic-bezier(.34,1.56,.64,1) .3s both,
              logoPulse 3s ease-in-out 1.2s infinite !important;
 }
@@ -432,6 +435,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   height:auto;
   position:relative;
   z-index:2;
+  background:transparent;mix-blend-mode:multiply;
   filter:drop-shadow(0 0 25px rgba(74,143,212,.7)) drop-shadow(0 0 50px rgba(74,143,212,.4)) drop-shadow(0 0 80px rgba(100,174,232,.2));
   animation:
     heroLogoEntrance 1.2s cubic-bezier(.34,1.56,.64,1) .6s both,
@@ -1072,6 +1076,7 @@ textarea.f-input{resize:vertical;min-height:90px}
 footer{background:var(--black);border-top:1px solid var(--border2);padding:1.8rem 4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
 footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--g1),var(--blue),transparent);opacity:.2}
 .f-logo{font-family:var(--font-title);font-size:.95rem;font-weight:600;color:var(--g2)}
+.f-logo-img{width:36px;height:36px;object-fit:contain;border-radius:6px;background:transparent;mix-blend-mode:multiply}
 .f-copy{font-family:var(--font-mono);font-size:.58rem;color:var(--steel)}
 .f-socials{display:flex;gap:.5rem}
 .slink{width:30px;height:30px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--steel);font-size:.62rem;font-family:var(--font-mono);text-decoration:none;transition:all .3s;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
@@ -1095,6 +1100,8 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   50%      { filter:drop-shadow(0 0 12px rgba(200,164,90,.7)); }
 }
 .nav-logo-img {
+  width:40px;height:40px;object-fit:contain;border-radius:6px;
+  background:transparent;mix-blend-mode:multiply;
   animation: logoSpin .8s cubic-bezier(.34,1.56,.64,1) .3s both,
              logoPulse 3s ease-in-out 1.2s infinite !important;
 }
@@ -1157,6 +1164,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   height:auto;
   position:relative;
   z-index:2;
+  background:transparent;mix-blend-mode:multiply;
   filter:drop-shadow(0 0 25px rgba(74,143,212,.7)) drop-shadow(0 0 50px rgba(74,143,212,.4)) drop-shadow(0 0 80px rgba(100,174,232,.2));
   animation:
     heroLogoEntrance 1.2s cubic-bezier(.34,1.56,.64,1) .6s both,
@@ -1316,9 +1324,8 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 </div>
 
 <nav id="main-nav">
-  <div class="nav-brand" style="display:flex;flex-direction:column;align-items:center;gap:.1rem">
-    <span style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--g2);letter-spacing:.15em;line-height:1;text-align:center;display:block">GI</span>
-    <div style="font-family:'Josefin Sans',sans-serif;font-size:.55rem;color:var(--steel2);letter-spacing:.18em;text-align:center;line-height:1.5">ENGINEERING<br><span style="opacity:.6">// ING. CIVIL · BOLIVIA</span></div>
+  <div class="nav-brand" style="display:flex;align-items:center">
+    <img src="GI LOGO.jpeg" alt="GI Engineering" class="nav-logo-img">
   </div>
   <ul class="nav-links">
     <li><a href="#sobre-mi">Perfil</a></li>
@@ -1376,7 +1383,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
       <div class="logo-ring logo-ring-2"></div>
       <div class="logo-ring logo-ring-3"></div>
       <div class="logo-glow-bg"></div>
-      <img src="assets/image-01.webp" alt="GI Engineering" class="hero-logo-img" loading="lazy" decoding="async">
+      <img src="GI LOGO.jpeg" alt="GI Engineering" class="hero-logo-img" loading="lazy" decoding="async">
     </div>
   </div>
   <div class="hero-scroll" style="z-index:5"><div class="scroll-line"></div><span>Scroll</span></div>
@@ -1623,7 +1630,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 </section>
 
 <footer>
-  <div class="f-logo">Ing. Gad Josue Inca Saavedra</div>
+  <div class="f-logo"><img src="GI LOGO.jpeg" alt="GI Engineering" class="f-logo-img"></div>
   <div class="f-copy">// © 2025 · Ingeniería Civil · Bolivia</div>
   <div class="f-socials">
     <a href="https://www.linkedin.com/in/gad-inca-012431186/" class="slink" target="_blank">in</a>
