@@ -390,18 +390,19 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 /* ── HERO LOGO ── */
 .hero-logo-wrap {
   position:relative;
-  width:700px;
-  height:700px;
+  width:525px;
+  height:525px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  background:transparent !important;
 }
 .logo-glow-bg {
   position:absolute;
-  width:500px;height:500px;
+  width:375px;height:375px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(74,143,212,.15) 0%,rgba(100,174,232,.08) 50%,transparent 75%);
+  background:transparent;
   animation:glowPulse 3s ease-in-out infinite;
 }
 @keyframes glowPulse {
@@ -414,9 +415,9 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   border:1px solid rgba(74,143,212,.25);
   animation:ringRotate 12s linear infinite;
 }
-.logo-ring-1 { width:560px;height:560px;animation-duration:12s;border-color:rgba(74,143,212,.3); }
-.logo-ring-2 { width:650px;height:650px;animation-duration:20s;animation-direction:reverse;border-color:rgba(74,143,212,.15); }
-.logo-ring-3 { width:450px;height:180px;animation-duration:8s;border-color:rgba(100,174,232,.15);border-style:dashed; }
+.logo-ring-1 { width:420px;height:420px;animation-duration:12s;border-color:rgba(74,143,212,.3); }
+.logo-ring-2 { width:488px;height:488px;animation-duration:20s;animation-direction:reverse;border-color:rgba(74,143,212,.15); }
+.logo-ring-3 { width:338px;height:135px;animation-duration:8s;border-color:rgba(100,174,232,.15);border-style:dashed; }
 @keyframes ringRotate {
   from { transform:rotate(0deg); }
   to   { transform:rotate(360deg); }
@@ -431,12 +432,13 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   box-shadow:0 0 10px var(--blue2);
 }
 .hero-logo-img {
-  width:900px;
+  width:675px;
   height:auto;
   position:relative;
   z-index:2;
-  background:transparent;mix-blend-mode:multiply;
-  filter:drop-shadow(0 0 25px rgba(74,143,212,.7)) drop-shadow(0 0 50px rgba(74,143,212,.4)) drop-shadow(0 0 80px rgba(100,174,232,.2));
+  background:transparent;
+  border-radius:0;
+  filter:drop-shadow(0 0 0 transparent);
   animation:
     heroLogoEntrance 1.2s cubic-bezier(.34,1.56,.64,1) .6s both,
     heroLogoFloat 4s ease-in-out 2s infinite,
@@ -1119,18 +1121,19 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 /* ── HERO LOGO ── */
 .hero-logo-wrap {
   position:relative;
-  width:700px;
-  height:700px;
+  width:525px;
+  height:525px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  background:transparent !important;
 }
 .logo-glow-bg {
   position:absolute;
-  width:500px;height:500px;
+  width:375px;height:375px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(74,143,212,.15) 0%,rgba(100,174,232,.08) 50%,transparent 75%);
+  background:transparent;
   animation:glowPulse 3s ease-in-out infinite;
 }
 @keyframes glowPulse {
@@ -1143,9 +1146,9 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   border:1px solid rgba(74,143,212,.25);
   animation:ringRotate 12s linear infinite;
 }
-.logo-ring-1 { width:560px;height:560px;animation-duration:12s;border-color:rgba(74,143,212,.3); }
-.logo-ring-2 { width:650px;height:650px;animation-duration:20s;animation-direction:reverse;border-color:rgba(74,143,212,.15); }
-.logo-ring-3 { width:450px;height:180px;animation-duration:8s;border-color:rgba(100,174,232,.15);border-style:dashed; }
+.logo-ring-1 { width:420px;height:420px;animation-duration:12s;border-color:rgba(74,143,212,.3); }
+.logo-ring-2 { width:488px;height:488px;animation-duration:20s;animation-direction:reverse;border-color:rgba(74,143,212,.15); }
+.logo-ring-3 { width:338px;height:135px;animation-duration:8s;border-color:rgba(100,174,232,.15);border-style:dashed; }
 @keyframes ringRotate {
   from { transform:rotate(0deg); }
   to   { transform:rotate(360deg); }
@@ -1160,12 +1163,13 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   box-shadow:0 0 10px var(--blue2);
 }
 .hero-logo-img {
-  width:900px;
+  width:675px;
   height:auto;
   position:relative;
   z-index:2;
-  background:transparent;mix-blend-mode:multiply;
-  filter:drop-shadow(0 0 25px rgba(74,143,212,.7)) drop-shadow(0 0 50px rgba(74,143,212,.4)) drop-shadow(0 0 80px rgba(100,174,232,.2));
+  background:transparent;
+  border-radius:0;
+  filter:drop-shadow(0 0 0 transparent);
   animation:
     heroLogoEntrance 1.2s cubic-bezier(.34,1.56,.64,1) .6s both,
     heroLogoFloat 4s ease-in-out 2s infinite,
