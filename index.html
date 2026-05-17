@@ -1233,35 +1233,69 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 
 .productos-bar {
   display: flex;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+  gap: 1.8rem;
+  margin-bottom: 1.5rem;
 }
 .prod-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(200,164,90,0.2);
-  padding: 0.5rem 1rem;
+  display: block;
   text-decoration: none;
-  color: var(--steel2);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  border: 1px solid rgba(200,164,90,0.2);
+  padding: 0.6rem;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    0 2px 8px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  transform: perspective(600px) rotateX(4deg);
+}
+.prod-item::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 40%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.18), transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 2;
+}
+.prod-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% -20%, rgba(200,164,90,0.25), transparent 65%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 1;
 }
 .prod-item:hover {
+  transform: perspective(600px) rotateX(0deg) scale(1.12) translateY(-6px);
   border-color: rgba(200,164,90,0.6);
-  color: var(--g2);
-  background: rgba(200,164,90,0.06);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.5),
+    0 0 40px rgba(200,164,90,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.prod-item:hover::after {
+  opacity: 1;
 }
 .prod-item img {
-  width: 28px;
-  height: 28px;
+  width: 140px;
+  height: 140px;
   object-fit: contain;
-  border-radius: 4px;
+  display: block;
+  border-radius: 10px;
+  position: relative;
+  z-index: 3;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  transition: filter 0.4s;
+}
+.prod-item:hover img {
+  filter: drop-shadow(0 8px 24px rgba(200,164,90,0.4)) brightness(1.1);
 }
 
 </style>
