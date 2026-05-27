@@ -1343,10 +1343,82 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   filter: drop-shadow(0 8px 24px rgba(200,164,90,0.4)) brightness(1.1);
 }
 
+#live-banner {
+  background: linear-gradient(135deg, #1d6fa4, #155d8c);
+  padding: 0.65rem 1.5rem;
+  position: relative;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(29,111,164,0.35);
+}
+.live-banner-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.live-badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.live-info {
+  flex: 1;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+.live-info strong { font-size: 0.85rem; }
+.live-info span { font-size: 0.75rem; opacity: 0.85; }
+.live-cta {
+  background: #fff;
+  color: #1d6fa4;
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.live-cta:hover { background: #e8f4fd; }
+.live-close {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+.live-close:hover { color: #fff; }
+@media (max-width: 600px) {
+  .live-info span { display: none; }
+}
+
 </style>
 </head>
 <body>
 
+<div id="live-banner">
+  <div class="live-banner-inner">
+    <div class="live-badge">🔴 CLASE EN VIVO</div>
+    <div class="live-info">
+      <strong>Jueves 28 mayo · 20:00 Bolivia</strong>
+      <span>Aprende a usar Quantia desde cero — ingeniero a ingeniero.</span>
+    </div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSf4m88KGDh7HkUN0elnqCNIvxOmUaAlQkViXW1xQ3D0kjR6pQ/viewform"
+       target="_blank" class="live-cta">Regístrate gratis →</a>
+    <button class="live-close" onclick="document.getElementById('live-banner').style.display='none';sessionStorage.setItem('b','1')">✕</button>
+  </div>
+</div>
 
 <div class="cur" id="cur"></div>
 <div class="cur-r" id="cur-r"></div>
@@ -1789,6 +1861,16 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 });
+</script>
+<script>
+(function(){
+  var expiry = new Date('2026-05-29T04:00:00Z');
+  var banner = document.getElementById('live-banner');
+  if (!banner) return;
+  if (new Date() > expiry || sessionStorage.getItem('b')) {
+    banner.style.display = 'none';
+  }
+})();
 </script>
 </body>
 </html>
