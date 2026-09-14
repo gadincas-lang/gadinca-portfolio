@@ -1403,6 +1403,76 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   .live-info span { display: none; }
 }
 
+
+/* CURSO QUANTIA */
+#curso-quantia {
+  padding: 3rem 2rem;
+  background: var(--dark2);
+  display: flex;
+  justify-content: center;
+}
+.curso-inner {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.curso-flyer {
+  width: 100%;
+  max-width: 860px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.curso-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.curso-btn-register {
+  background: #1d6fa4;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.curso-btn-register:hover {
+  background: #155d8c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29,111,164,0.4);
+}
+.curso-btn-whatsapp {
+  background: #25D366;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.curso-btn-whatsapp:hover {
+  background: #128C7E;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+}
+@media (max-width: 768px) {
+  #curso-quantia { padding: 2rem 1rem; }
+  .curso-actions { flex-direction: column; width: 100%; }
+  .curso-btn-register, .curso-btn-whatsapp { 
+    text-align: center; 
+    width: 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -1411,7 +1481,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
   <div class="live-banner-inner">
     <div class="live-badge">🔴 CLASE EN VIVO</div>
     <div class="live-info">
-      <strong>Jueves 28 mayo · 20:00 Bolivia</strong>
+      <strong>Jueves 4 junio · 20:00 Bolivia</strong>
       <span>Aprende a usar Quantia desde cero — ingeniero a ingeniero.</span>
     </div>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSf4m88KGDh7HkUN0elnqCNIvxOmUaAlQkViXW1xQ3D0kjR6pQ/viewform"
@@ -1570,6 +1640,25 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
       <p class="about-p reveal rd2">Especializado en edificaciones institucionales, infraestructura vial, estructuras metálicas, saneamiento y estudios geotécnicos. Combino rigor técnico con eficiencia operativa para garantizar calidad y cumplimiento en cada proyecto.</p>
       <div class="regions reveal rd2"><span class="rpill">// Chuquisaca</span><span class="rpill">// Potosí</span><span class="rpill">// Santa Cruz</span></div>
       <div class="tags reveal rd3"><span class="tag">Diseño estructural</span><span class="tag">Supervisión técnica</span><span class="tag">Gestión de proyectos</span><span class="tag">Infraestructura vial</span><span class="tag">Estructuras metálicas</span><span class="tag">Saneamiento</span><span class="tag">Estudios geotécnicos</span><span class="tag">Presupuestos S10</span><span class="tag">AutoCAD</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CURSO QUANTIA -->
+<section id="curso-quantia" class="curso-section">
+  <div class="curso-inner">
+    <img src="assets/flyer-curso-quantia.jpg" 
+         alt="Curso Quantia — Presupuestos de Obra" 
+         class="curso-flyer">
+    <div class="curso-actions">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSe2tf0-ol2xT_dric5BHZBO9Vixh0ZIZY1x6MBoWkML2lNccw/viewform?usp=publish-editor"
+         target="_blank" class="curso-btn-register">
+        📋 Regístrate aquí
+      </a>
+      <a href="https://chat.whatsapp.com/Dli8BaQus4z1EPashXOSgs?s=cl&p=i&mlu=4&ilr=4"
+         target="_blank" class="curso-btn-whatsapp">
+        💬 Unirse al grupo
+      </a>
     </div>
   </div>
 </section>
@@ -1864,7 +1953,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 <script>
 (function(){
-  var expiry = new Date('2026-05-29T04:00:00Z');
+  var expiry = new Date('2026-06-05T04:00:00Z');
   var banner = document.getElementById('live-banner');
   if (!banner) return;
   if (new Date() > expiry || sessionStorage.getItem('b')) {
