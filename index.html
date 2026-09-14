@@ -1404,78 +1404,108 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
 }
 
 
-/* CURSO QUANTIA */
-#curso-quantia {
-  padding: 3rem 2rem;
-  background: var(--dark2);
+
+/* CURSO QUANTIA MODAL */
+.curso-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100000;
   display: flex;
-  justify-content: center;
-}
-.curso-inner {
-  max-width: 900px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-}
-.curso-flyer {
-  width: 100%;
-  max-width: 860px;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-.curso-actions {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
   justify-content: center;
+  padding: 1rem;
+  animation: cursoFadeIn 0.3s ease;
 }
-.curso-btn-register {
-  background: #1d6fa4;
+@keyframes cursoFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.curso-modal-box {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 1rem;
+  animation: cursoSlideUp 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes cursoSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.curso-modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  background: rgba(0,0,0,0.5);
   color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s;
+}
+.curso-modal-close:hover { background: rgba(0,0,0,0.8); }
+.curso-modal-img {
+  width: 100%;
+  border-radius: 10px;
+  display: block;
+}
+.curso-modal-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.curso-modal-btn-register,
+.curso-modal-btn-whatsapp {
+  flex: 1;
+  text-align: center;
+  color: #fff;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.75rem 1.8rem;
+  font-size: 0.85rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.3s;
+  white-space: nowrap;
 }
-.curso-btn-register:hover {
-  background: #155d8c;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(29,111,164,0.4);
-}
-.curso-btn-whatsapp {
-  background: #25D366;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.75rem 1.8rem;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s;
-}
-.curso-btn-whatsapp:hover {
-  background: #128C7E;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
-}
-@media (max-width: 768px) {
-  #curso-quantia { padding: 2rem 1rem; }
-  .curso-actions { flex-direction: column; width: 100%; }
-  .curso-btn-register, .curso-btn-whatsapp { 
-    text-align: center; 
-    width: 100%;
-  }
+.curso-modal-btn-register { background: #1d6fa4; }
+.curso-modal-btn-register:hover { background: #155d8c; }
+.curso-modal-btn-whatsapp { background: #25D366; }
+.curso-modal-btn-whatsapp:hover { background: #128C7E; }
+@media (max-width: 600px) {
+  .curso-modal-actions { flex-direction: column; }
 }
 </style>
 </head>
 <body>
+
+<!-- CURSO QUANTIA MODAL -->
+<div id="curso-modal" class="curso-modal-overlay">
+  <div class="curso-modal-box">
+    <button class="curso-modal-close" onclick="cerrarCursoModal()">✕</button>
+    <img src="assets/flyer-curso-quantia.jpg" 
+         alt="Curso Quantia" class="curso-modal-img">
+    <div class="curso-modal-actions">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSe2tf0-ol2xT_dric5BHZBO9Vixh0ZIZY1x6MBoWkML2lNccw/viewform"
+         target="_blank" class="curso-modal-btn-register">
+        📋 Regístrate aquí
+      </a>
+      <a href="https://chat.whatsapp.com/Dli8BaQus4z1EPashXOSgs?s=cl&p=i&mlu=4&ilr=4"
+         target="_blank" class="curso-modal-btn-whatsapp">
+        💬 Unirse al grupo
+      </a>
+    </div>
+  </div>
+</div>
 
 <div id="live-banner">
   <div class="live-banner-inner">
@@ -1640,25 +1670,6 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;back
       <p class="about-p reveal rd2">Especializado en edificaciones institucionales, infraestructura vial, estructuras metálicas, saneamiento y estudios geotécnicos. Combino rigor técnico con eficiencia operativa para garantizar calidad y cumplimiento en cada proyecto.</p>
       <div class="regions reveal rd2"><span class="rpill">// Chuquisaca</span><span class="rpill">// Potosí</span><span class="rpill">// Santa Cruz</span></div>
       <div class="tags reveal rd3"><span class="tag">Diseño estructural</span><span class="tag">Supervisión técnica</span><span class="tag">Gestión de proyectos</span><span class="tag">Infraestructura vial</span><span class="tag">Estructuras metálicas</span><span class="tag">Saneamiento</span><span class="tag">Estudios geotécnicos</span><span class="tag">Presupuestos S10</span><span class="tag">AutoCAD</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- CURSO QUANTIA -->
-<section id="curso-quantia" class="curso-section">
-  <div class="curso-inner">
-    <img src="assets/flyer-curso-quantia.jpg" 
-         alt="Curso Quantia — Presupuestos de Obra" 
-         class="curso-flyer">
-    <div class="curso-actions">
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSe2tf0-ol2xT_dric5BHZBO9Vixh0ZIZY1x6MBoWkML2lNccw/viewform?usp=publish-editor"
-         target="_blank" class="curso-btn-register">
-        📋 Regístrate aquí
-      </a>
-      <a href="https://chat.whatsapp.com/Dli8BaQus4z1EPashXOSgs?s=cl&p=i&mlu=4&ilr=4"
-         target="_blank" class="curso-btn-whatsapp">
-        💬 Unirse al grupo
-      </a>
     </div>
   </div>
 </section>
@@ -1959,6 +1970,24 @@ document.addEventListener('DOMContentLoaded', function(){
   if (new Date() > expiry || sessionStorage.getItem('b')) {
     banner.style.display = 'none';
   }
+})();
+</script>
+<script>
+function cerrarCursoModal() {
+  document.getElementById('curso-modal').style.display = 'none';
+}
+(function(){
+  var expiry = new Date('2026-09-23T04:00:00Z'); // expira 23 sep
+  var modal = document.getElementById('curso-modal');
+  if (!modal) return;
+  if (new Date() > expiry) {
+    modal.style.display = 'none';
+    return;
+  }
+  // Cerrar al hacer clic fuera de la caja
+  modal.addEventListener('click', function(e){
+    if (e.target === modal) cerrarCursoModal();
+  });
 })();
 </script>
 </body>
